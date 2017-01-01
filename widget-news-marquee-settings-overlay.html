@@ -1,0 +1,141 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../overlay-container/animated-overlay-behavior.html">
+<link rel="import" href="../goc-styles/goc-styles.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../color-input/color-input.html">
+
+<!--
+`widget-news-marquee-settings-overlay`
+-->
+
+<dom-module id="widget-news-marquee-settings-overlay">
+  <template>
+    <style include="header-layout-styles button-styles form-styles">
+      :host {
+        background: var(--goc-background-color);
+        bottom: 0;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+    </style>
+
+    <div class="header-layout">
+      <div class="header-layout__header">
+        <div class="header-toolbar">
+          <paper-icon-button on-tap="_closeTapped" icon="close"></paper-icon-button>
+          <div class="header-toolbar__main-content">
+            <div class="header-toolbar__title">Settings</div>
+          </div>
+          <paper-spinner-lite class="header-toolbar__spinner" active="[[loading]]"></paper-spinner-lite>
+          <button class="button" on-tap="_saveTapped">Save</button>
+        </div>
+      </div>
+
+      <div class="header-layout__content">
+        <div class="form">
+          <div class="form__item">
+            <label class="form__label">Text color</label>  
+            <color-input>
+              <input id="colorInput" class="form__input" placeholder="Color" value="[[settings.color]]"/>
+            </color-input>
+          </div>
+
+          <div class="form__item">
+            <label class="form__label">Background</label>  
+            <color-input>
+              <input id="backgroundInput" class="form__input" placeholder="Background" value="[[settings.background]]" />
+            </color-input>
+          </div>
+
+          <div class="form__item">
+            <label class="form__label">Font size</label>  
+            <input id="fontSizeInput" class="form__input" type="number" placeholder="Font size" value="[[settings.fontSize]]"/>
+          </div>
+
+          <div class="form__item form__item--last">
+            <label class="form__label">Speed</label>
+            <input type="range" id="speedInput" class="form__range" min="1" max="10" step="1" value="[[settings.speed]]" on-input="_onSpeedInput">
+            <div>[[settings.speed]]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </template>
+</dom-module>
+
+<script>
+(function() {
+  'use strict';
+
+  Polymer({
+
+    is: 'widget-news-marquee-settings-overlay',
+
+    properties: {
+
+      settings: {
+        type: Object,
+        value: _ => {
+          return {speed: 1};
+        }
+      },
+  
+      loading: {
+        type: Boolean,
+        value: false
+      }
+
+    },
+
+    behaviors: [
+      AnimatedOverlayBehavior
+    ],
+
+    listeners: {
+      'overlay-open-animation-finish': '_onOverlayOpenAnimationFinish'
+    },
+
+    _onOverlayOpenAnimationFinish() {
+      this.$.colorInput.focus();
+    },
+
+    _closeTapped() {
+      requestAnimationFrame(_ => {
+        this.opened = false;
+      });
+    },
+
+    _validate() {
+      return true;
+    },
+
+    _saveTapped() {
+      const isValid = this._validate();
+
+      if (isValid) {
+        const settings = this._getFormValues();
+
+        this.fire('save', {settings});
+      }
+    },
+
+    _getFormValues() {
+      return {
+        color: this.$.colorInput.value,
+        background: this.$.backgroundInput.value,
+        fontSize: this.$.fontSizeInput.value,
+        speed: this.$.speedInput.value
+      };
+    },
+
+    _onSpeedInput(event) {
+      this.set('settings.speed', event.currentTarget.value);
+    }
+
+  });
+
+})();
+</script>

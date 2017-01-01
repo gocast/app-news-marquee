@@ -1,0 +1,116 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../overlay-container/animated-overlay-behavior.html">
+<link rel="import" href="../goc-styles/goc-styles.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+
+<!--
+`widget-news-marquee-publish-overlay`
+-->
+
+<dom-module id="widget-news-marquee-publish-overlay">
+  <template>
+    <style include="header-layout-styles">
+      :host {
+        background: var(--goc-background-color);
+        bottom: 0;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+
+      textarea {
+        border: 0;
+        box-sizing: border-box;
+        display: block;
+        font-family: sans-serif;
+        font-size: 18px;
+        height: 100%;
+        outline: 0;
+        padding: 20px 15px 15px;
+        resize: none;
+        width: 100%;
+      }
+
+      .header-layout__content {
+        max-width: 100%;
+        padding: 0;
+      }
+    </style>
+
+    <div class="header-layout">
+      <div class="header-layout__header">
+        <div class="header-toolbar">
+          <paper-icon-button on-tap="_closeTapped" icon="close"></paper-icon-button>
+          <div class="header-toolbar__main-content">
+            <div class="header-toolbar__title">[[_computeToolbarTitle(text)]]</div>
+          </div>
+          <paper-spinner-lite class="header-toolbar__spinner" active="[[loading]]"></paper-spinner-lite>
+          <paper-icon-button icon="plane" on-tap="_submitTapped" aria-label="Add news item"></paper-icon-button>
+        </div>
+      </div>
+
+      <div class="header-layout__content">
+        <textarea id="textarea" placeholder="Write here..." value="[[text]]"></textarea>
+      </div>
+    </div>
+
+  </template>
+</dom-module>
+
+<script>
+(function() {
+  'use strict';
+
+  Polymer({
+
+    is: 'widget-news-marquee-publish-overlay',
+
+    properties: {
+
+      text: String,
+
+      loading: {
+        type: Boolean,
+        value: false
+      }
+
+    },
+
+    behaviors: [
+      AnimatedOverlayBehavior
+    ],
+
+    listeners: {
+      'overlay-open-animation-finish': '_onOverlayOpenAnimationFinish'
+    },
+
+    _closeTapped() {
+      this.opened = false;
+    },
+
+    _submitTapped() {
+      const text = this.$.textarea.value;
+
+      if (!text.length) {
+        return;
+      }
+
+      this.fire(this.text ? 'edit' : 'publish', {text});
+    },
+
+    _onOverlayOpenAnimationFinish() {
+      this.$.textarea.focus();
+    },
+
+    _computeToolbarTitle(text) {
+      if (text) {
+        return 'Edit news item';
+      }
+      return 'Publish news';
+    }
+
+  });
+
+})();
+</script>

@@ -1,0 +1,135 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+
+<!--
+`widget-news-marquee`
+
+@demo demo/index.html
+-->
+
+<dom-module id="widget-news-marquee">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      #content {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      .marquee {
+        display: inline-block;
+        position: absolute;
+        right: 0;
+        /*margin: auto;*/
+        white-space: nowrap;
+        /*min-width: 100%;*/
+      }
+
+    </style>
+
+    <div id="content"></div>
+
+  </template>
+</dom-module>
+
+<script>
+(function() {
+  'use strict';
+
+  Polymer({
+
+    is: 'widget-news-marquee',
+
+    properties: {
+
+      data: Object,
+
+      _isAttached: Boolean,
+
+    },
+
+    observers: [
+      '_dataChanged(data, _isAttached)'
+    ],
+
+    attached() {
+      this.async(_ => this._isAttached = true, 16);
+    },
+
+    detached() {
+      this._isAttached = false;
+    },
+
+    _dataChanged(data) {
+      const news = data.items;
+      const config = Object.assign({}, data.config, {
+        // 1 is the slowest from there, there is no limit
+        speed: 5
+      });
+
+      this.$.content.innerHTML = '';
+
+      if (!news || !news.length) {
+        return;
+      }
+
+      if (config.speed <= 0) {
+        config.speed = 1;
+        this.fire('notify-info', {text: `Speed can't be lower than 1`});
+      }
+
+      if (config.style) {
+        this.$.content.style = config.style;
+      }
+
+      const docWidth = document.documentElement.offsetWidth;
+      const marquee = document.createElement('div');
+      let newsString = '';
+      marquee.classList.add('marquee');
+
+      news.forEach((item, i) => {
+        newsString += item.text;
+
+        if (i < news.length - 1) {
+          newsString += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+        }
+      });
+
+      marquee.innerHTML = newsString;
+      Polymer.dom(this.$.content).appendChild(marquee);
+
+      if (marquee.offsetWidth > docWidth) {
+        const duration = Math.round(newsString.length * 500 / config.speed);
+
+        marquee.animate([
+          {transform: 'translateX(100%)'},
+          {transform: 'translateX(-100%)'}
+        ], {
+          duration,
+          easing: 'linear',
+          iterations: Infinity
+        });
+      } else {
+        marquee.style.position = 'relative';
+        marquee.style.margin = 'auto';
+        marquee.style.right = 'auto';
+      }
+
+      marquee.animate([
+        {opacity: 0},
+        {opacity: 1}
+      ], {
+        duration: 150
+      });
+    }
+
+  });
+
+})();
+</script>

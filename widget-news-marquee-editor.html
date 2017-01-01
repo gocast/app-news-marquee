@@ -1,0 +1,274 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../vertical-list/vertical-list.html">
+<link rel="import" href="../goc-styles/goc-styles.html">
+<link rel="import" href="../goc-icons/goc-icons.html">
+<link rel="import" href="../dropdown-menu/dropdown-menu-container.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="widget-news-marquee-publish-overlay.html">
+<link rel="import" href="widget-news-marquee-settings-overlay.html">
+
+<!--
+`widget-news-marquee-editor`
+
+@demo demo/widget-news-marquee-editor.html 
+-->
+
+<dom-module id="widget-news-marquee-editor">
+  <template>
+    <style include="header-layout-styles missing-well-styles">
+      :host {
+        display: block;
+        height: 100%;
+        background: var(--goc-background-color);
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .header-layout__content {
+        padding: 20px 0;
+      }
+
+      .item__text {
+        word-break: break-all;
+      }
+
+      .item__date {
+        color: var(--paper-grey-600);
+        font-size: 14px;
+        margin: 6px 0 0;
+      }        
+
+      .item__content {
+        @apply(--layout-flex);
+      }
+
+    </style>
+
+    <div class="header-layout">
+      <div class="header-layout__header">
+        <div class="header-toolbar">
+          <a href$="/presentation/[[presentationId]]">
+            <paper-icon-button icon="arrow-back" aria-label="Go back"></paper-icon-button>
+          </a>
+          <div class="header-toolbar__main-content">
+            <div class="header-toolbar__title">[[customName]]</div>
+            <div class="header-toolbar__subtitle">News marquee</div>
+          </div>
+          <paper-spinner-lite class="header-toolbar__spinner" active="[[loading]]"></paper-spinner-lite>
+          <paper-icon-button icon="message-plus" on-tap="_addTapped" aria-label="Add news item"></paper-icon-button>
+          <paper-icon-button icon="brush" on-tap="_settingsTapped" aria-label="Add news item"></paper-icon-button>
+        </div>
+      </div>
+
+      <div class="header-layout__content">
+        <vertical-list hidden$="[[!data.items.length]]">
+          <h3 class="vertical-list__title">Published news</h3>
+
+          <template id="domRepeat" is="dom-repeat" items="[[data.items]]">
+            <div on-tap="_itemTapped" class="vertical-list__item--layout-horizontal">
+              <div class="item__content">
+                <div class="item__text">[[item.text]]</div>
+                <p class="item__date">[[_computeDate(item.date)]] ago</p>                
+              </div>
+
+              <dropdown-menu-container item="[[item]]">
+                <paper-icon-button icon="dots-vertical" title="More"></paper-icon-button>
+
+                <template is="dom-template">
+                  <button on-tap="_editTapped">Edit</button>
+                  <button on-tap="_deleteTapped">Delete</button>
+                </template>
+              </dropdown-menu-container>
+            </div>
+          </template>
+        </vertical-list>
+
+        <!--<template is="dom-if" if="[[_computeMissingWellIf(data.items.length, loading, isAttached)]]">-->
+        <template is="dom-if" if="[[!data.items.length]]">
+          <div class="missing-well">
+            <div class="missing-well__title">No news found</div>
+            <div class="missing-well__p">Add some news to get started with this widget.</div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+  </template>
+</dom-module>
+
+<script>
+(function() {
+  'use strict';
+
+  Polymer({
+
+    is: 'widget-news-marquee-editor',
+
+    properties: {
+
+      data: {
+        type: Object,
+        value: _ => {
+          return {items: []};
+        }
+      },
+
+      customName: String,
+
+      presentationId: String,
+
+      loading: {
+        type: Boolean,
+        value: false
+      }
+
+    },
+
+    _openPublishOverlay(item = null) {
+      if (this._publishOverlay) {
+        return;
+      }
+
+      this._publishOverlay = this.create('widget-news-marquee-publish-overlay', {
+        onDetach: _ => {
+          this._publishOverlay = null;
+        },
+        text: item ? item.text : null,
+        opened: true
+      });
+
+      this._publishOverlay.addEventListener('edit', event => {
+        const index = this.data.items.indexOf(item);
+        this.set(`data.items.${index}.text`, event.detail.text);
+        this._publishOverlayWidgetUpdate();
+      });
+
+      this._publishOverlay.addEventListener('publish', event => {
+        const item = {
+          text: event.detail.text,
+          date: new Date().getTime()
+        };
+
+        this.unshift('data.items', item);
+        this._publishOverlayWidgetUpdate();
+      });
+    },
+
+    _publishOverlayWidgetUpdate() {
+      const updateEvent = this.fire('widget-update');
+
+      if (updateEvent.updateRequest) {
+        this._publishOverlay.loading = true;
+
+        updateEvent.updateRequest.then(_ => {
+          this._publishOverlay.loading = false;
+          this._publishOverlay.opened = false;
+        }).catch(_ => {
+          this._publishOverlay.loading = false;
+        });
+      } else {
+        this._publishOverlay.opened = false;
+      }
+    },
+
+    _addTapped() {
+      this._openPublishOverlay();
+    },
+
+    _itemTapped(event) {
+      this._openPublishOverlay(event.model.item);
+    },
+
+    _editTapped(event) {
+      const item = event.currentTarget.parentElement._dropdownContainer.item;
+      this._openPublishOverlay(item);
+    },
+
+    _deleteTapped(event) {
+      const item = event.currentTarget.parentElement._dropdownContainer.item;
+      this.splice('data.items', this.data.items.indexOf(item), 1);
+      const updateEvent = this.fire('widget-update');
+
+      if (updateEvent.updateRequest) {
+        this.loading = true;
+
+        updateEvent.updateRequest.then(_ => {
+          this.loading = false;
+        }).catch(_ => {
+          this.loading = false;
+        });
+      }
+    },
+
+    _settingsTapped(event) {
+      if (this._settingsOverlay) {
+        return;
+      }
+
+      this._settingsOverlay = this.create('widget-news-marquee-settings-overlay', {
+        onDetach: _ => {
+          this._settingsOverlay = null;
+        },
+        opened: true
+      });
+
+      if (this.data.settings) {
+        this._settingsOverlay.settings = this.data.settings;
+      }
+
+      this._settingsOverlay.addEventListener('save', event => {
+        this.data.settings = event.detail.settings;
+        const updateEvent = this.fire('widget-update');
+
+        if (updateEvent.updateRequest) {
+          this._settingsOverlay.loading = true;
+
+          updateEvent.updateRequest.then(_ => {
+            this._settingsOverlay.loading = false;
+            this._settingsOverlay.opened = false;
+          }).catch(_ => {
+            this._settingsOverlay.loading = false;
+          });
+        } else {
+          this._settingsOverlay.opened = false;
+        }
+      });
+    },
+
+    _computeDate(time) {
+      if (!time) {
+        return '-'
+      }
+
+      const timeNow = new Date().getTime();
+      const secondsAgo = (timeNow - Number(time)) / 1000;
+
+      if (secondsAgo < 60) {
+        return Math.round(secondsAgo) + 's';
+      }
+      
+      const minutesAgo = secondsAgo / 60; 
+      if (minutesAgo < 60) {
+        return Math.round(minutesAgo) + 'm';
+      }
+
+      const hoursAgo = minutesAgo / 60;
+      if (hoursAgo < 24) {
+        return Math.round(hoursAgo) + 'h'; 
+      }
+
+      const daysAgo = hoursAgo / 24;
+      return Math.round(daysAgo) + 'd';
+    },
+
+    _computeMissingWellIf(data, loading, isAttached) {
+      return (!data.items || !Boolean(data.items.length)) && !loading && isAttached;
+    }
+
+  });
+
+})();
+</script>
