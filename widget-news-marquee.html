@@ -14,26 +14,31 @@
         display: block;
       }
 
-      #content {
+      #container {
         @apply(--layout-horizontal);
         @apply(--layout-center);
         height: 100%;
-        width: 100%;
         overflow: hidden;
+        width: 100%;
       }
 
-      .marquee {
-        display: inline-block;
-        position: absolute;
-        right: 0;
-        /*margin: auto;*/
+      #headlines {
         white-space: nowrap;
-        /*min-width: 100%;*/
+      }
+
+      .headline {
+        margin-right: 200px;
       }
 
     </style>
 
-    <div id="content"></div>
+    <div id="container" style$="[[_computeStyle(_settings.background, _settings.color, _settings.fontSize)]]">
+      <div id="headlines">
+        <template is="dom-repeat" items="[[data.items]]">
+          <span class="headline">[[item.text]]</span>
+        </template>
+      </div>
+    </div>
 
   </template>
 </dom-module>
@@ -41,6 +46,13 @@
 <script>
 (function() {
   'use strict';
+
+  const defaultSettings = {
+    background: 'black',
+    color: 'white',
+    fontSize: 36,
+    speed: 5    
+  };
 
   Polymer({
 
@@ -50,83 +62,53 @@
 
       data: Object,
 
-      _isAttached: Boolean,
+      _settings: {
+        type: Object,
+        value: _ => {
+          return defaultSettings;
+        }
+      }
 
     },
 
     observers: [
-      '_dataChanged(data, _isAttached)'
+      '_dataChanged(data, isAttached)'
     ],
 
-    attached() {
-      this.async(_ => this._isAttached = true, 16);
-    },
-
-    detached() {
-      this._isAttached = false;
-    },
-
     _dataChanged(data) {
-      const news = data.items;
-      const config = Object.assign({}, data.config, {
-        // 1 is the slowest from there, there is no limit
-        speed: 5
-      });
+      if (data) {
+        this._updateSettings();
+        this._animate();
+      }
+    },
 
-      this.$.content.innerHTML = '';
+    _animate() {
+      const rect = this.getBoundingClientRect();
+      const duration = (10 - Number(this._settings.speed)) * 16000;
 
-      if (!news || !news.length) {
-        return;
+      if (this._animation) {
+        this._animation.finish();
       }
 
-      if (config.speed <= 0) {
-        config.speed = 1;
-        this.fire('notify-info', {text: `Speed can't be lower than 1`});
-      }
-
-      if (config.style) {
-        this.$.content.style = config.style;
-      }
-
-      const docWidth = document.documentElement.offsetWidth;
-      const marquee = document.createElement('div');
-      let newsString = '';
-      marquee.classList.add('marquee');
-
-      news.forEach((item, i) => {
-        newsString += item.text;
-
-        if (i < news.length - 1) {
-          newsString += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-        }
-      });
-
-      marquee.innerHTML = newsString;
-      Polymer.dom(this.$.content).appendChild(marquee);
-
-      if (marquee.offsetWidth > docWidth) {
-        const duration = Math.round(newsString.length * 500 / config.speed);
-
-        marquee.animate([
-          {transform: 'translateX(100%)'},
+      requestAnimationFrame(_ => {
+        this._animation = this.$.headlines.animate([
+          {transform: `translateX(${rect.width}px)`},
           {transform: 'translateX(-100%)'}
         ], {
           duration,
-          easing: 'linear',
           iterations: Infinity
         });
-      } else {
-        marquee.style.position = 'relative';
-        marquee.style.margin = 'auto';
-        marquee.style.right = 'auto';
-      }
-
-      marquee.animate([
-        {opacity: 0},
-        {opacity: 1}
-      ], {
-        duration: 150
       });
+    },
+
+    _updateSettings() {
+      if (this.data) {
+        this._settings = Object.assign({}, defaultSettings, this.data.settings);
+      }
+    },
+
+    _computeStyle(background, color, fontSize) {
+      return `background: ${background}; color: ${color}; font-size: ${fontSize}px;`;
     }
 
   });
