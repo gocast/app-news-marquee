@@ -1,10 +1,11 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../vertical-list/vertical-list.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../dropdown-menu/dropdown-menu-container.html">
+<link rel="import" href="../date-parser/date-parser.html">
 <link rel="import" href="../goc-styles/goc-styles.html">
 <link rel="import" href="../goc-icons/goc-icons.html">
-<link rel="import" href="../dropdown-menu/dropdown-menu-container.html">
-<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../touch-item/touch-item.html">
 <link rel="import" href="widget-news-marquee-publish-overlay.html">
 <link rel="import" href="widget-news-marquee-settings-overlay.html">
 
@@ -16,11 +17,11 @@
 
 <dom-module id="widget-news-marquee-editor">
   <template>
-    <style include="header-layout-styles missing-well-styles">
+    <style include="header-layout-styles list-styles text-styles missing-well-styles">
       :host {
+        background: var(--goc-background-color);
         display: block;
         height: 100%;
-        background: var(--goc-background-color);
       }
 
       [hidden] {
@@ -31,17 +32,16 @@
         padding: 20px 0;
       }
 
-      .item__text {
-        word-break: break-all;
+      .list__item {
+        @apply(--layout-horizontal);
       }
 
-      .item__date {
-        color: var(--paper-grey-600);
-        font-size: 14px;
-        margin: 6px 0 0;
-      }        
+      .news__text {
+        word-break: break-all;
+        margin-bottom: 4px;
+      }
 
-      .item__content {
+      .news__content {
         @apply(--layout-flex);
       }
 
@@ -64,14 +64,14 @@
       </div>
 
       <div class="header-layout__content">
-        <vertical-list hidden$="[[!data.items.length]]">
-          <h3 class="vertical-list__title">Published news</h3>
+        <div class="list" hidden$="[[!data.items.length]]">
+          <h3 class="list__title">Published news</h3>
 
           <template id="domRepeat" is="dom-repeat" items="[[data.items]]">
-            <div on-tap="_itemTapped" class="vertical-list__item--layout-horizontal">
-              <div class="item__content">
-                <div class="item__text">[[item.text]]</div>
-                <p class="item__date">[[_computeDate(item.date)]] ago</p>                
+            <touch-item on-tap="_itemTapped" class$="[[_computeItemClass(index)]]">
+              <div class="news__content">
+                <div class="news__text">[[item.text]]</div>
+                <date-parser class="caption" date="[[item.date]]" format="time-ago"></date-parser>
               </div>
 
               <dropdown-menu-container item="[[item]]">
@@ -82,11 +82,10 @@
                   <button on-tap="_deleteTapped">Delete</button>
                 </template>
               </dropdown-menu-container>
-            </div>
+            </touch-item>
           </template>
-        </vertical-list>
+        </div>
 
-        <!--<template is="dom-if" if="[[_computeMissingWellIf(data.items.length, loading, isAttached)]]">-->
         <template is="dom-if" if="[[!data.items.length]]">
           <div class="missing-well">
             <div class="missing-well__title">No news found</div>
@@ -238,34 +237,14 @@
       });
     },
 
-    _computeDate(time) {
-      if (!time) {
-        return '-'
+    _computeItemClass(index) {
+      let classNames = 'list__item';
+
+      if (index === this.data.items.length - 1) {
+        classNames += ' list__item--last';
       }
 
-      const timeNow = new Date().getTime();
-      const secondsAgo = (timeNow - Number(time)) / 1000;
-
-      if (secondsAgo < 60) {
-        return Math.round(secondsAgo) + 's';
-      }
-      
-      const minutesAgo = secondsAgo / 60; 
-      if (minutesAgo < 60) {
-        return Math.round(minutesAgo) + 'm';
-      }
-
-      const hoursAgo = minutesAgo / 60;
-      if (hoursAgo < 24) {
-        return Math.round(hoursAgo) + 'h'; 
-      }
-
-      const daysAgo = hoursAgo / 24;
-      return Math.round(daysAgo) + 'd';
-    },
-
-    _computeMissingWellIf(data, loading, isAttached) {
-      return (!data.items || !Boolean(data.items.length)) && !loading && isAttached;
+      return classNames;
     }
 
   });
