@@ -55,7 +55,7 @@
           </a>
           <div class="header-toolbar__main-content">
             <div class="header-toolbar__title">[[customName]]</div>
-            <div class="header-toolbar__subtitle">News marquee</div>
+            <div class="header-toolbar__subtitle">Marquesina de noticias</div>
           </div>
           <paper-spinner-lite class="header-toolbar__spinner" active="[[loading]]"></paper-spinner-lite>
           <paper-icon-button icon="message-plus" on-tap="_addTapped" aria-label="Add news item"></paper-icon-button>
@@ -65,7 +65,7 @@
 
       <div class="header-layout__content">
         <div class="list" hidden$="[[!data.items.length]]">
-          <h3 class="list__title">Published news</h3>
+          <h3 class="list__title">Noticias publicadas</h3>
 
           <template id="domRepeat" is="dom-repeat" items="[[data.items]]">
             <touch-item on-tap="_itemTapped" class$="[[_computeItemClass(index)]]">
@@ -78,8 +78,8 @@
                 <paper-icon-button icon="dots-vertical" title="More"></paper-icon-button>
 
                 <template is="dom-template">
-                  <button on-tap="_editTapped">Edit</button>
-                  <button on-tap="_deleteTapped">Delete</button>
+                  <button on-tap="_editTapped">Editar</button>
+                  <button on-tap="_deleteTapped">Borrar</button>
                 </template>
               </dropdown-menu-container>
             </touch-item>
@@ -88,8 +88,8 @@
 
         <template is="dom-if" if="[[!data.items.length]]">
           <div class="missing-well">
-            <div class="missing-well__title">No news found</div>
-            <div class="missing-well__p">Add some news to get started with this widget.</div>
+            <div class="missing-well__title">No hay noticias</div>
+            <div class="missing-well__p">Añade noticias haciendo click en el icono de + de arriba a la derecha.</div>
           </div>
         </template>
       </div>

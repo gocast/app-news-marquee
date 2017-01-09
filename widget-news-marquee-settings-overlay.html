@@ -26,36 +26,36 @@
         <div class="header-toolbar">
           <paper-icon-button on-tap="_closeTapped" icon="close"></paper-icon-button>
           <div class="header-toolbar__main-content">
-            <div class="header-toolbar__title">Settings</div>
+            <div class="header-toolbar__title">Configuración</div>
           </div>
           <paper-spinner-lite class="header-toolbar__spinner" active="[[loading]]"></paper-spinner-lite>
-          <button class="button" on-tap="_saveTapped">Save</button>
+          <button class="button" on-tap="_saveTapped">Guardar</button>
         </div>
       </div>
 
       <div class="header-layout__content">
         <div class="form">
           <div class="form__item">
-            <label class="form__label">Text color</label>  
+            <label class="form__label">Color del texto</label>  
             <color-input>
-              <input id="colorInput" class="form__input" placeholder="Color" value="[[settings.color]]"/>
+              <input id="colorInput" class="form__input" placeholder="Texto" value="[[settings.color]]"/>
             </color-input>
           </div>
 
           <div class="form__item">
-            <label class="form__label">Background</label>  
+            <label class="form__label">Color de fondo</label>  
             <color-input>
-              <input id="backgroundInput" class="form__input" placeholder="Background" value="[[settings.background]]" />
+              <input id="backgroundInput" class="form__input" placeholder="Fondo" value="[[settings.background]]" />
             </color-input>
           </div>
 
           <div class="form__item">
-            <label class="form__label">Font size</label>  
-            <input id="fontSizeInput" class="form__input" type="number" placeholder="Font size" value="[[settings.fontSize]]"/>
+            <label class="form__label">Tamaño de la fuente</label>  
+            <input id="fontSizeInput" class="form__input" type="number" placeholder="Tamaño de la fuente" value="[[settings.fontSize]]"/>
           </div>
 
           <div class="form__item form__item--last">
-            <label class="form__label">Speed</label>
+            <label class="form__label">Velocidad</label>
             <input type="range" id="speedInput" class="form__range" min="1" max="10" step="1" value="[[settings.speed]]" on-input="_onSpeedInput">
             <div>[[settings.speed]]</div>
           </div>
