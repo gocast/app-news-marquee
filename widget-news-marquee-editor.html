@@ -189,17 +189,7 @@
     _deleteTapped(event) {
       const item = event.currentTarget.parentElement._dropdownContainer.item;
       this.splice('data.items', this.data.items.indexOf(item), 1);
-      const updateEvent = this.fire('widget-update');
-
-      if (updateEvent.updateRequest) {
-        this.loading = true;
-
-        updateEvent.updateRequest.then(_ => {
-          this.loading = false;
-        }).catch(_ => {
-          this.loading = false;
-        });
-      }
+      this.fire('widget-update');
     },
 
     _settingsTapped(event) {
