@@ -87,7 +87,7 @@
       const duration = (10 - Number(this._settings.speed)) * 16000;
 
       if (this._animation) {
-        this._animation.finish();
+        this._animation.cancel();
       }
 
       requestAnimationFrame(_ => {
