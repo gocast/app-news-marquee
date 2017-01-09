@@ -123,11 +123,12 @@
     },
 
     _getFormValues() {
+      // Dynamodb AttributeValues should not contain an empty string
       return {
-        color: this.$.colorInput.value,
-        background: this.$.backgroundInput.value,
-        fontSize: this.$.fontSizeInput.value,
-        speed: this.$.speedInput.value
+        color: this.$.colorInput.value || null,
+        background: this.$.backgroundInput.value || null,
+        fontSize: this.$.fontSizeInput.value || null,
+        speed: this.$.speedInput.value || null
       };
     },
 
