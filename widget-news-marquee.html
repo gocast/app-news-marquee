@@ -6,7 +6,6 @@
 
 @demo demo/index.html
 -->
-
 <dom-module id="widget-news-marquee">
   <template>
     <style>
@@ -83,11 +82,16 @@
     },
 
     _animate() {
-      const rect = this.getBoundingClientRect();
-      const duration = (10 - Number(this._settings.speed)) * 16000;
+      if (!this.data || !this.data.items) {
+        return;
+      }
 
+      const rect = this.getBoundingClientRect();
+      const durationFactor = Math.min(this.data.items.length * 3000, 16000);
+      const duration = (10 - Number(this._settings.speed)) * durationFactor;
+   
       if (this._animation) {
-        this._animation.finish();
+        this._animation.cancel();
       }
 
       requestAnimationFrame(_ => {
