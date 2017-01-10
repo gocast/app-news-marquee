@@ -11,7 +11,8 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.6.0",
     "overlay-container": "git@github.com:sharedlabs/overlay-container.git",
-    "vertical-list": "git@github.com:sharedlabs/vertical-list.git",
+    "touch-item": "git@github.com:sharedlabs/touch-item.git",
+    "date-parser": "git@github.com:sharedlabs/date-parser.git",
     "dropdown-menu": "git@github.com:sharedlabs/dropdown-menu.git",
     "color-input": "git@github.com:sharedlabs/color-input.git",
     "goc-styles": "git@github.com:gocast/goc-styles.git",
