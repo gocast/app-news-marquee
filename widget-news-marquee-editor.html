@@ -126,7 +126,7 @@
 
     },
 
-    _openPublishOverlay(item = null) {
+    _openPublishOverlay(item) {
       if (this._publishOverlay) {
         return;
       }
@@ -142,7 +142,9 @@
       this._publishOverlay.addEventListener('edit', event => {
         const index = this.data.items.indexOf(item);
         this.set(`data.items.${index}.text`, event.detail.text);
-        this._publishOverlayWidgetUpdate();
+        // update
+        this.fire('widget-update');
+        this._publishOverlay.opened = false;
       });
 
       this._publishOverlay.addEventListener('publish', event => {
@@ -152,25 +154,10 @@
         };
 
         this.unshift('data.items', item);
-        this._publishOverlayWidgetUpdate();
-      });
-    },
-
-    _publishOverlayWidgetUpdate() {
-      const updateEvent = this.fire('widget-update');
-
-      if (updateEvent.updateRequest) {
-        this._publishOverlay.loading = true;
-
-        updateEvent.updateRequest.then(_ => {
-          this._publishOverlay.loading = false;
-          this._publishOverlay.opened = false;
-        }).catch(_ => {
-          this._publishOverlay.loading = false;
-        });
-      } else {
+        // update
+        this.fire('widget-update');
         this._publishOverlay.opened = false;
-      }
+      });
     },
 
     _addTapped() {
@@ -198,10 +185,10 @@
       }
 
       this._settingsOverlay = this.create('widget-news-marquee-settings-overlay', {
+        opened: true,
         onDetach: _ => {
           this._settingsOverlay = null;
-        },
-        opened: true
+        }
       });
 
       if (this.data.settings) {
@@ -210,20 +197,8 @@
 
       this._settingsOverlay.addEventListener('save', event => {
         this.data.settings = event.detail.settings;
-        const updateEvent = this.fire('widget-update');
-
-        if (updateEvent.updateRequest) {
-          this._settingsOverlay.loading = true;
-
-          updateEvent.updateRequest.then(_ => {
-            this._settingsOverlay.loading = false;
-            this._settingsOverlay.opened = false;
-          }).catch(_ => {
-            this._settingsOverlay.loading = false;
-          });
-        } else {
-          this._settingsOverlay.opened = false;
-        }
+        this.fire('widget-update');
+        this._settingsOverlay.opened = false;
       });
     },
 
