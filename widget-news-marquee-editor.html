@@ -115,15 +115,30 @@
         }
       },
 
-      customName: String,
+      release: Object,
 
-      presentationId: String,
+      widgetId: Number,
+
+      dataUpdatedAt: Number,
+
+      releaseUpdatedAt: Number,
+
+      customName: String,
 
       loading: {
         type: Boolean,
         value: false
       }
 
+    },
+
+    _updateWidget() {
+      this.fire('widget-update', {
+        data: this.data,
+        widgetId: this.widgetId,
+        // directly to channel release
+        updateRelease: true,
+      });
     },
 
     _openPublishOverlay(item) {
@@ -142,8 +157,7 @@
       this._publishOverlay.addEventListener('edit', event => {
         const index = this.data.items.indexOf(item);
         this.set(`data.items.${index}.text`, event.detail.text);
-        // update
-        this.fire('widget-update');
+        this._updateWidget();
         this._publishOverlay.opened = false;
       });
 
@@ -154,8 +168,7 @@
         };
 
         this.unshift('data.items', item);
-        // update
-        this.fire('widget-update');
+        this._updateWidget();
         this._publishOverlay.opened = false;
       });
     },
@@ -176,7 +189,7 @@
     _deleteTapped(event) {
       const item = event.currentTarget.parentElement._dropdownContainer.item;
       this.splice('data.items', this.data.items.indexOf(item), 1);
-      this.fire('widget-update');
+      this._updateWidget();
     },
 
     _settingsTapped(event) {
@@ -197,7 +210,7 @@
 
       this._settingsOverlay.addEventListener('save', event => {
         this.data.settings = event.detail.settings;
-        this.fire('widget-update');
+        this._updateWidget();
         this._settingsOverlay.opened = false;
       });
     },
