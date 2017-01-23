@@ -5,10 +5,10 @@
 <link rel="import" href="../color-input/color-input.html">
 
 <!--
-`widget-news-marquee-settings-overlay`
+`app-news-marquee-settings-overlay`
 -->
 
-<dom-module id="widget-news-marquee-settings-overlay">
+<dom-module id="app-news-marquee-settings-overlay">
   <template>
     <style include="header-layout-styles button-styles form-styles">
       :host {
@@ -36,21 +36,21 @@
       <div class="header-layout__content">
         <div class="form">
           <div class="form__item">
-            <label class="form__label">Color del texto</label>  
+            <label class="form__label">Color del texto</label>
             <color-input>
               <input id="colorInput" class="form__input" placeholder="Texto" value="[[settings.color]]"/>
             </color-input>
           </div>
 
           <div class="form__item">
-            <label class="form__label">Color de fondo</label>  
+            <label class="form__label">Color de fondo</label>
             <color-input>
               <input id="backgroundInput" class="form__input" placeholder="Fondo" value="[[settings.background]]" />
             </color-input>
           </div>
 
           <div class="form__item">
-            <label class="form__label">Tamaño de la fuente</label>  
+            <label class="form__label">Tamaño de la fuente</label>
             <input id="fontSizeInput" class="form__input" type="number" placeholder="Tamaño de la fuente" value="[[settings.fontSize]]"/>
           </div>
 
@@ -72,7 +72,7 @@
 
   Polymer({
 
-    is: 'widget-news-marquee-settings-overlay',
+    is: 'app-news-marquee-settings-overlay',
 
     properties: {
 
@@ -82,7 +82,7 @@
           return {speed: 1};
         }
       },
-  
+
       loading: {
         type: Boolean,
         value: false

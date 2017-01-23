@@ -6,16 +6,16 @@
 <link rel="import" href="../goc-styles/goc-styles.html">
 <link rel="import" href="../goc-icons/goc-icons.html">
 <link rel="import" href="../touch-item/touch-item.html">
-<link rel="import" href="widget-news-marquee-publish-overlay.html">
-<link rel="import" href="widget-news-marquee-settings-overlay.html">
+<link rel="import" href="app-news-marquee-publish-overlay.html">
+<link rel="import" href="app-news-marquee-settings-overlay.html">
 
 <!--
-`widget-news-marquee-editor`
+`app-news-marquee-editor`
 
-@demo demo/widget-news-marquee-editor.html 
+@demo demo/app-news-marquee-editor.html 
 -->
 
-<dom-module id="widget-news-marquee-editor">
+<dom-module id="app-news-marquee-editor">
   <template>
     <style include="header-layout-styles list-styles text-styles missing-well-styles">
       :host {
@@ -54,7 +54,7 @@
             <paper-icon-button icon="arrow-back" aria-label="Go back"></paper-icon-button>
           </a>
           <div class="header-toolbar__main-content">
-            <div class="header-toolbar__title">[[customName]]</div>
+            <div class="header-toolbar__title">[[contentName]]</div>
             <div class="header-toolbar__subtitle">Marquesina de noticias</div>
           </div>
           <paper-spinner-lite class="header-toolbar__spinner" active="[[loading]]"></paper-spinner-lite>
@@ -104,7 +104,7 @@
 
   Polymer({
 
-    is: 'widget-news-marquee-editor',
+    is: 'app-news-marquee-editor',
 
     properties: {
 
@@ -117,13 +117,13 @@
 
       release: Object,
 
-      widgetId: Number,
+      contentId: Number,
 
       dataUpdatedAt: Number,
 
       releaseUpdatedAt: Number,
 
-      customName: String,
+      contentName: String,
 
       loading: {
         type: Boolean,
@@ -132,10 +132,10 @@
 
     },
 
-    _updateWidget() {
-      this.fire('widget-update', {
+    _updateContent() {
+      this.fire('content-update', {
         data: this.data,
-        widgetId: this.widgetId,
+        contentId: this.contentId,
         // directly to channel release
         updateRelease: true,
       });
@@ -146,7 +146,7 @@
         return;
       }
 
-      this._publishOverlay = this.create('widget-news-marquee-publish-overlay', {
+      this._publishOverlay = this.create('app-news-marquee-publish-overlay', {
         onDetach: _ => {
           this._publishOverlay = null;
         },
@@ -157,7 +157,7 @@
       this._publishOverlay.addEventListener('edit', event => {
         const index = this.data.items.indexOf(item);
         this.set(`data.items.${index}.text`, event.detail.text);
-        this._updateWidget();
+        this._updateContent();
         this._publishOverlay.opened = false;
       });
 
@@ -168,7 +168,7 @@
         };
 
         this.unshift('data.items', item);
-        this._updateWidget();
+        this._updateContent();
         this._publishOverlay.opened = false;
       });
     },
@@ -189,7 +189,7 @@
     _deleteTapped(event) {
       const item = event.currentTarget.parentElement._dropdownContainer.item;
       this.splice('data.items', this.data.items.indexOf(item), 1);
-      this._updateWidget();
+      this._updateContent();
     },
 
     _settingsTapped(event) {
@@ -197,7 +197,7 @@
         return;
       }
 
-      this._settingsOverlay = this.create('widget-news-marquee-settings-overlay', {
+      this._settingsOverlay = this.create('app-news-marquee-settings-overlay', {
         opened: true,
         onDetach: _ => {
           this._settingsOverlay = null;
@@ -210,7 +210,7 @@
 
       this._settingsOverlay.addEventListener('save', event => {
         this.data.settings = event.detail.settings;
-        this._updateWidget();
+        this._updateContent();
         this._settingsOverlay.opened = false;
       });
     },

@@ -1,1 +1,1 @@
-# widget-news-marquee
+# app-news-marquee

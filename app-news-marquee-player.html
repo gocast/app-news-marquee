@@ -3,11 +3,11 @@
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
-`widget-news-marquee`
+`app-news-marquee`
 
 @demo demo/index.html
 -->
-<dom-module id="widget-news-marquee">
+<dom-module id="app-news-marquee">
   <template>
     <style>
       :host {
@@ -51,12 +51,12 @@
     background: 'black',
     color: 'white',
     fontSize: 36,
-    speed: 5    
+    speed: 5
   };
 
   Polymer({
 
-    is: 'widget-news-marquee',
+    is: 'app-news-marquee',
 
     behaviors: [
       Polymer.IronResizableBehavior
@@ -98,7 +98,7 @@
       const rect = this.getBoundingClientRect();
       const durationFactor = Math.min(this.data.items.length * 3000, 16000);
       const duration = (10 - Number(this._settings.speed)) * durationFactor;
-   
+
       if (this._animation) {
         this._animation.cancel();
       }

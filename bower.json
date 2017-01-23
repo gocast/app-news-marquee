@@ -1,9 +1,9 @@
 {
-  "name": "widget-news-marquee",
-  "main": "widget-news-marquee.html",
+  "name": "app-news-marquee",
+  "main": "app-news-marquee.html",
   "version": "1.0.0",
   "repository": {
-    "url": "https://github.com/gocast/widget-news-marquee.git",
+    "url": "https://github.com/gocast/app-news-marquee.git",
     "type": "git"
   },
   "author": "Pedro García <pdgago@gmail.com>",
