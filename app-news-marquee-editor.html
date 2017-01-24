@@ -51,7 +51,7 @@
       <div class="header-layout__header">
         <div class="header-toolbar">
           <a href="/">
-            <paper-icon-button icon="arrow-back" aria-label="Go back"></paper-icon-button>
+            <paper-icon-button icon="arrow-back" on-tap="_arrowBackTapped" title="Back"></paper-icon-button>
           </a>
           <div class="header-toolbar__main-content">
             <div class="header-toolbar__title">[[contentName]]</div>
@@ -223,7 +223,11 @@
       }
 
       return classNames;
-    }
+    },
+
+    _arrowBackTapped() {
+      this.fire('close-app');
+    },
 
   });
 
