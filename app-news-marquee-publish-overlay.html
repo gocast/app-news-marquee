@@ -1,5 +1,5 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../overlay-container/animated-overlay-behavior.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../overlay-container/animated-overlay-mixin.html">
 <link rel="import" href="../goc-styles/goc-styles.html">
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
 
@@ -9,7 +9,7 @@
 
 <dom-module id="app-news-marquee-publish-overlay">
   <template>
-    <style include="header-layout-styles">
+    <style include="header-layout-styles icon-btn-styles">
       :host {
         background: var(--goc-background-color);
         bottom: 0;
@@ -41,76 +41,110 @@
     <div class="header-layout">
       <div class="header-layout__header">
         <div class="header-toolbar">
-          <paper-icon-button on-tap="_closeTapped" icon="close"></paper-icon-button>
+          <button
+              class="icon-btn icon-btn--primary"
+              on-click="_onCloseTapped"
+              title="[[localize('PublishPage.Header.Close')]]">
+              <iron-icon icon="close"></iron-icon>
+          </button>
+
           <div class="header-toolbar__main-content">
             <div class="header-toolbar__title">[[_computeToolbarTitle(text)]]</div>
           </div>
+
           <paper-spinner-lite class="header-toolbar__spinner" active="[[loading]]"></paper-spinner-lite>
-          <paper-icon-button icon="plane" on-tap="_submitTapped" aria-label="Add news item"></paper-icon-button>
+
+          <button
+              class="icon-btn icon-btn--primary"
+              on-click="_onSubmitTapped"
+              title="[[localize('PublishPage.Header.Add')]]">
+              <iron-icon icon="plane"></iron-icon>
+          </button>
         </div>
       </div>
 
       <div class="header-layout__content">
-        <textarea id="textarea" placeholder="Escribe aquí..." value="[[text]]"></textarea>
+        <textarea
+            id="textarea"
+            placeholder="[[localize('PublishPage.Textarea.Placeholder')]]"
+            value="[[text]]"></textarea>
       </div>
     </div>
 
   </template>
-</dom-module>
 
-<script>
-(function() {
-  'use strict';
+  <script>
 
-  Polymer({
+    class AppNewsMarqueePublishOverlay extends AnimatedOverlayMixin(AppLocalizeMixin(Polymer.Element)) {
 
-    is: 'app-news-marquee-publish-overlay',
+      static get is() {return 'app-news-marquee-publish-overlay';}
 
-    properties: {
+      static get config() {
+        return {
+          properties: {
 
-      text: String,
+            text: String,
 
-      loading: {
-        type: Boolean,
-        value: false
+            language: String,
+
+            resources: Object,
+
+            loading: {
+              type: Boolean,
+              value: false
+            },
+
+          }
+        };
       }
 
-    },
-
-    behaviors: [
-      AnimatedOverlayBehavior
-    ],
-
-    listeners: {
-      'overlay-open-animation-finish': '_onOverlayOpenAnimationFinish'
-    },
-
-    _closeTapped() {
-      this.opened = false;
-    },
-
-    _submitTapped() {
-      const text = this.$.textarea.value;
-
-      if (!text.length) {
-        return;
+      connectedCallback() {
+        super.connectedCallback();
+        this._toggleListeners({enable: true});
       }
 
-      this.fire(this.text ? 'edit' : 'publish', {text});
-    },
-
-    _onOverlayOpenAnimationFinish() {
-      this.$.textarea.focus();
-    },
-
-    _computeToolbarTitle(text) {
-      if (text) {
-        return 'Editar noticia';
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this._toggleListeners({enable: false});
       }
-      return 'Publicar noticia';
+
+      _onCloseTapped() {
+        requestAnimationFrame(_ => this.opened = false);
+      }
+
+      _onSubmitTapped() {
+        const text = this.$.textarea.value;
+
+        if (!text.length) {
+          return;
+        }
+
+        const eventName = this.text ? 'edit' : 'publish';
+        this.dispatchEvent(new CustomEvent(eventName, {
+          composed: true,
+          detail: {text},
+        }));
+      }
+
+      _overlayOpenAnimationFinish() {
+        this.$.textarea.focus();
+      }
+
+      _toggleListeners({enable}) {
+        const m = enable ? 'addEventListener' : 'removeEventListener';
+        this[m]('overlay-open-animation-finish', this._overlayOpenAnimationFinish);
+      }
+
+      _computeToolbarTitle(text) {
+        if (text) {
+          return this.localize('PublishPage.Header.EditTitle');
+        }
+        return this.localize('PublishPage.Header.AddTitle');
+      }
+
     }
 
-  });
+    customElements.define(AppNewsMarqueePublishOverlay.is, AppNewsMarqueePublishOverlay);
 
-})();
-</script>
+  </script>
+</dom-module>

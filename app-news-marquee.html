@@ -1,10 +1,12 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../app-localize-mixin/app-localize-mixin.html">
 <link rel="import" href="../dropdown-menu/dropdown-menu-container.html">
-<link rel="import" href="../date-parser/date-parser.html">
-<link rel="import" href="../goc-styles/goc-styles.html">
+<link rel="import" href="../goc-apps/goc-app-icon.html">
+<link rel="import" href="../goc-apps/goc-apps-collection.html">
 <link rel="import" href="../goc-icons/goc-icons.html">
+<link rel="import" href="../goc-styles/goc-styles.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+
 <link rel="import" href="../touch-item/touch-item.html">
 <link rel="import" href="app-news-marquee-publish-overlay.html">
 <link rel="import" href="app-news-marquee-settings-overlay.html">
@@ -12,12 +14,12 @@
 <!--
 `app-news-marquee`
 
-@demo demo/app-news-marquee.html 
+@demo demo/app-news-marquee.html
 -->
 
 <dom-module id="app-news-marquee">
   <template>
-    <style include="header-layout-styles list-styles text-styles missing-well-styles">
+    <style include="header-layout-styles text-styles box-styles missing-well-styles icon-btn-styles">
       :host {
         background: var(--goc-background-color);
         display: block;
@@ -32,7 +34,7 @@
         padding: 20px 0;
       }
 
-      .list__item {
+      .box__item {
         @apply(--layout-horizontal);
       }
 
@@ -47,187 +49,306 @@
 
     </style>
 
+    <goc-apps-collection
+        app-name="news-marquee"
+        item="{{appInfo}}"
+        language="[[language]]"></goc-apps-collection>
+
     <div class="header-layout">
       <div class="header-layout__header">
         <div class="header-toolbar">
-          <paper-icon-button icon="arrow-back" on-tap="_arrowBackTapped" title="Back"></paper-icon-button>
+          <button
+              class="icon-btn icon-btn--primary"
+              on-click="_onBackClicked"
+              title="[[localize('EditorPage.Header.BackButton')]]">
+              <iron-icon icon="arrow-back"></iron-icon>
+          </button>
+
+          <goc-app-icon size="small" app-name="news-marquee"></goc-app-icon>
+
           <div class="header-toolbar__main-content">
             <div class="header-toolbar__title">[[contentName]]</div>
-            <div class="header-toolbar__subtitle">Marquesina de noticias</div>
+            <div class="header-toolbar__subtitle">[[appInfo.displayName]]</div>
           </div>
+
           <paper-spinner-lite class="header-toolbar__spinner" active="[[loading]]"></paper-spinner-lite>
-          <paper-icon-button icon="message-plus" on-tap="_addTapped" aria-label="Add news item"></paper-icon-button>
-          <paper-icon-button icon="brush" on-tap="_settingsTapped" aria-label="Add news item"></paper-icon-button>
+
+          <button
+              class="icon-btn icon-btn--primary"
+              on-click="_onAddTapped"
+              title="[[localize('EditorPage.Header.AddButton')]]">
+              <iron-icon icon="message-plus"></iron-icon>
+          </button>
+
+          <button
+              class="icon-btn icon-btn--primary"
+              on-click="_onSettingsTapped"
+              title="[[localize('EditorPage.Header.OptionsButton')]]">
+              <iron-icon icon="brush"></iron-icon>
+          </button>
         </div>
       </div>
 
       <div class="header-layout__content">
-        <div class="list" hidden$="[[!data.items.length]]">
-          <h3 class="list__title">Noticias publicadas</h3>
+        <div hidden$="[[!data.items.length]]">
+          <h3>[[localize('EditorPage.List.Title')]]</h3>
 
-          <template id="domRepeat" is="dom-repeat" items="[[data.items]]">
-            <touch-item on-tap="_itemTapped" class$="[[_computeItemClass(index)]]">
-              <div class="news__content">
-                <div class="news__text">[[item.text]]</div>
-                <date-parser class="caption" date="[[item.date]]" format="time-ago"></date-parser>
-              </div>
+          <div class="box">
+            <template id="domRepeat" is="dom-repeat" items="[[data.items]]">
+              <touch-item on-click="_onItemTapped" class$="[[_computeItemClass(index)]]">
+                <div class="news__content">
+                  <div class="news__text">[[item.text]]</div>
+                  <div class="caption">[[localize('EditorPage.List.Updated', 'date', item.date)]]</div>
+                </div>
 
-              <dropdown-menu-container item="[[item]]">
-                <paper-icon-button icon="dots-vertical" title="More"></paper-icon-button>
+                <dropdown-menu-container item="[[item]]">
+                  <button
+                      class="icon-btn icon-btn--primary"
+                      title="[[localize('EditorPage.List.DotsTitle.More')]]">
+                      <iron-icon icon="dots-vertical"></iron-icon>
+                  </button>
 
-                <template is="dom-template">
-                  <button on-tap="_editTapped">Editar</button>
-                  <button on-tap="_deleteTapped">Borrar</button>
-                </template>
-              </dropdown-menu-container>
-            </touch-item>
-          </template>
+                  <template is="dom-template">
+                    <button on-click="_onEditTapped">[[localize('EditorPage.List.Dropdown.Edit')]]</button>
+                    <button on-click="_onDeleteTapped">[[localize('EditorPage.List.Dropdown.Delete')]]</button>
+                  </template>
+                </dropdown-menu-container>
+              </touch-item>
+            </template>
+          </div>
         </div>
 
-        <template is="dom-if" if="[[!data.items.length]]">
+        <template is="dom-if" if="[[_computeMissingWellVisible(loading, data)]]">
           <div class="missing-well">
-            <div class="missing-well__title">No hay noticias</div>
-            <div class="missing-well__p">Añade noticias haciendo click en el icono de + de arriba a la derecha.</div>
+            <div class="missing-well__title">[[localize('EditorPage.List.Empty.Title')]]</div>
+            <div class="missing-well__p">[[localize('EditorPage.List.Empty.Subtitle')]]</div>
           </div>
         </template>
       </div>
     </div>
 
   </template>
-</dom-module>
 
-<script>
-(function() {
-  'use strict';
+  <script>
 
-  Polymer({
+    class AppNewsMarquee extends AppLocalizeMixin(Polymer.Element) {
+      static get is() {return 'app-news-marquee';}
 
-    is: 'app-news-marquee',
+      static get config() {
+        return {
+          properties: {
 
-    properties: {
+            data: {
+              type: Object,
+              value: _ => {
+                return {items: []};
+              }
+            },
 
-      data: {
-        type: Object,
-        value: _ => {
-          return {items: []};
-        }
-      },
+            release: Object,
 
-      release: Object,
+            contentId: Number,
 
-      contentId: Number,
+            dataUpdatedAt: Number,
 
-      dataUpdatedAt: Number,
+            releaseUpdatedAt: Number,
 
-      releaseUpdatedAt: Number,
+            contentName: String,
 
-      contentName: String,
+            loading: {
+              type: Boolean,
+              value: false
+            },
 
-      loading: {
-        type: Boolean,
-        value: false
+            language: {
+              type: String,
+              value: _ => 'en'
+            },
+
+            resources: {
+              type: Object,
+              value() {
+                return {
+                  en: {
+                    'EditorPage.Header.AddButton': 'Add news item',
+                    'EditorPage.Header.BackButton': 'Back',
+                    'EditorPage.Header.OptionsButton': 'Options',
+                    'EditorPage.List.DotsTitle.More': 'More options',
+                    'EditorPage.List.Dropdown.Delete': 'Delete',
+                    'EditorPage.List.Dropdown.Edit': 'Edit',
+                    'EditorPage.List.Empty.Subtitle': 'Click on the "+" icon at the top right of the screen',
+                    'EditorPage.List.Empty.Title': `You haven't added any news yet!`,
+                    'EditorPage.List.Title': 'Published news',
+                    'EditorPage.List.Updated': '{date, date, short} {date, time, short}',
+                    'PublishPage.Header.Add': 'Add',
+                    'PublishPage.Header.AddTitle': 'Add new',
+                    'PublishPage.Header.Close': 'Close',
+                    'PublishPage.Header.EditTitle': 'Edit new',
+                    'PublishPage.Textarea.Placeholder': 'Write here...',
+                    'SettingsPage.Header.Button.Save': 'Save',
+                    'SettingsPage.Header.Close': 'Close',
+                    'SettingsPage.Header.Title': 'Configuration',
+                    'SettingsPage.Options.BackgroundColor.Label': 'Background color',
+                    'SettingsPage.Options.BackgroundColor.Placeholder': 'Hex, Rgb, Rgba ...',
+                    'SettingsPage.Options.FontSize.Label': 'Font size',
+                    'SettingsPage.Options.FontSize.Placeholder': `In px's`,
+                    'SettingsPage.Options.Speed.Label': 'Speed',
+                    'SettingsPage.Options.TextColor.Label': 'Text color',
+                    'SettingsPage.Options.TextColor.Placeholder': 'Hex, Rgb, Rgba ...',
+                  },
+
+                  es: {
+                    'EditorPage.Header.AddButton': 'Añadir noticia',
+                    'EditorPage.Header.BackButton': 'Atrás',
+                    'EditorPage.Header.OptionsButton': 'Opciones',
+                    'EditorPage.List.DotsTitle.More': 'Mas opciones',
+                    'EditorPage.List.Dropdown.Delete': 'Borrar',
+                    'EditorPage.List.Dropdown.Edit': 'Editar',
+                    'EditorPage.List.Empty.Subtitle': 'Añade noticias haciendo click en el icono "+" en la esquina superior derecha de la pantalla.',
+                    'EditorPage.List.Empty.Title': 'Aun no has añadido ningun noticia!',
+                    'EditorPage.List.Title': 'Noticias publicadas',
+                    'EditorPage.List.Updated': '{date, date, short} {date, time, short}',
+                    'PublishPage.Header.Add': 'Añadir',
+                    'PublishPage.Header.AddTitle': 'Añadir noticia',
+                    'PublishPage.Header.Close': 'Cerrar',
+                    'PublishPage.Header.EditTitle': 'Editar noticia',
+                    'PublishPage.Textarea.Placeholder': 'Escribe aquí...',
+                    'SettingsPage.Header.Button.Save': 'Guardar',
+                    'SettingsPage.Header.Close': 'Cerrar',
+                    'SettingsPage.Header.Title': 'Configuración',
+                    'SettingsPage.Options.BackgroundColor.Label': 'Color del fondo',
+                    'SettingsPage.Options.BackgroundColor.Placeholder': 'Hex, Rgb, Rgba ...',
+                    'SettingsPage.Options.FontSize.Label': 'Tamaño de la fuente',
+                    'SettingsPage.Options.FontSize.Placeholder': 'En px',
+                    'SettingsPage.Options.Speed.Label': 'Velocidad',
+                    'SettingsPage.Options.TextColor.Label': 'Color del texto',
+                    'SettingsPage.Options.TextColor.Placeholder': 'Hex, Rgb, Rgba ...',
+                  }
+                };
+              }
+            },
+
+          }
+        };
       }
 
-    },
-
-    _updateContent() {
-      this.fire('content-update', {
-        data: this.data,
-        contentId: this.contentId,
-        // directly to channel release
-        updateRelease: true,
-      });
-    },
-
-    _openPublishOverlay(item) {
-      if (this._publishOverlay) {
-        return;
+      _onBackClicked() {
+        this.dispatchEvent(new Event('close-app', {composed: true}));
       }
 
-      this._publishOverlay = this.create('app-news-marquee-publish-overlay', {
-        onDetach: _ => {
-          this._publishOverlay = null;
-        },
-        text: item ? item.text : null,
-        opened: true
-      });
+      _onAddTapped() {
+        this._openPublishOverlay();
+      }
 
-      this._publishOverlay.addEventListener('edit', event => {
+      _onSettingsTapped(event) {
+        this._openSettingsOverlay();
+      }
+
+      _onItemTapped(event) {
+        this._openPublishOverlay(event.model.item);
+      }
+
+      _onEditTapped(event) {
+        const item = event.currentTarget.parentElement._dropdownContainer.item;
+        this._openPublishOverlay(item);
+      }
+
+      _onDeleteTapped(event) {
+        const item = event.currentTarget.parentElement._dropdownContainer.item;
+        this._deleteItem(item);
+      }
+
+      _settingsUpdated(event) {
+        this.data.settings = event.detail.settings;
+        this._settingsOverlay.opened = false;
+        this._updateContent();
+      }
+
+      _newEdited(item, event) {
         const index = this.data.items.indexOf(item);
         this.set(`data.items.${index}.text`, event.detail.text);
         this._updateContent();
         this._publishOverlay.opened = false;
-      });
+      }
 
-      this._publishOverlay.addEventListener('publish', event => {
+      _newAdded(event) {
         const item = {
           text: event.detail.text,
-          date: new Date().getTime()
+          date: new Date().getTime(),
         };
 
         this.unshift('data.items', item);
+        this.data = Object.assign({}, this.data);
         this._updateContent();
         this._publishOverlay.opened = false;
-      });
-    },
-
-    _addTapped() {
-      this._openPublishOverlay();
-    },
-
-    _itemTapped(event) {
-      this._openPublishOverlay(event.model.item);
-    },
-
-    _editTapped(event) {
-      const item = event.currentTarget.parentElement._dropdownContainer.item;
-      this._openPublishOverlay(item);
-    },
-
-    _deleteTapped(event) {
-      const item = event.currentTarget.parentElement._dropdownContainer.item;
-      this.splice('data.items', this.data.items.indexOf(item), 1);
-      this._updateContent();
-    },
-
-    _settingsTapped(event) {
-      if (this._settingsOverlay) {
-        return;
       }
 
-      this._settingsOverlay = this.create('app-news-marquee-settings-overlay', {
-        opened: true,
-        onDetach: _ => {
-          this._settingsOverlay = null;
-        }
-      });
-
-      if (this.data.settings) {
-        this._settingsOverlay.settings = this.data.settings;
+      _updateContent() {
+        this.dispatchEvent(new CustomEvent('content-update', {
+          composed: true,
+          detail: {
+            data: this.data,
+            contentId: this.contentId,
+            // directly to channel release
+            updateRelease: true,
+          }
+        }));
       }
 
-      this._settingsOverlay.addEventListener('save', event => {
-        this.data.settings = event.detail.settings;
+      _deleteItem(item) {
+        this.splice('data.items', this.data.items.indexOf(item), 1);
         this._updateContent();
-        this._settingsOverlay.opened = false;
-      });
-    },
-
-    _computeItemClass(index) {
-      let classNames = 'list__item';
-
-      if (index === this.data.items.length - 1) {
-        classNames += ' list__item--last';
       }
 
-      return classNames;
-    },
+      _openSettingsOverlay() {
+        if (this._settingsOverlay) {
+          return;
+        }
 
-    _arrowBackTapped() {
-      this.fire('close-app');
-    },
+        const overlay = document.createElement('app-news-marquee-settings-overlay');
+        overlay.open();
+        overlay.language = this.language;
+        overlay.resources = this.resources;
+        overlay.onDetach = _ => this._settingsOverlay = null;
+        overlay.addEventListener('save', this._settingsUpdated.bind(this));
+        if (this.data.settings) {
+          overlay.settings = this.data.settings;
+        }
+        this._settingsOverlay = overlay;
+      }
 
-  });
+      _openPublishOverlay(item) {
+        if (this._publishOverlay) {
+          return;
+        }
 
-})();
-</script>
+        const overlay = document.createElement('app-news-marquee-publish-overlay');
+        overlay.text = item ? item.text : null;
+        overlay.language = this.language;
+        overlay.resources = this.resources;
+        overlay.open();
+        overlay.onDetach = _ => this._publishOverlay = null;
+        overlay.addEventListener('edit', this._newEdited.bind(this, item));
+        overlay.addEventListener('publish', this._newAdded.bind(this));
+        this._publishOverlay = overlay;
+      }
+
+      _computeItemClass(index) {
+        let classNames = 'box__item';
+
+        if (index === this.data.items.length - 1) {
+          classNames += ' box__item--last';
+        }
+        return classNames;
+      }
+
+      _computeMissingWellVisible(loading, data) {
+        return !loading && data && !data.items.length;
+      }
+
+    }
+
+    customElements.define(AppNewsMarquee.is, AppNewsMarquee);
+
+  </script>
+</dom-module>

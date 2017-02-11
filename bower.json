@@ -9,23 +9,40 @@
   "author": "Pedro García <pdgago@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.6.0",
-    "overlay-container": "git@github.com:sharedlabs/overlay-container.git",
-    "touch-item": "git@github.com:sharedlabs/touch-item.git",
-    "date-parser": "git@github.com:sharedlabs/date-parser.git",
-    "dropdown-menu": "git@github.com:sharedlabs/dropdown-menu.git",
+    "app-localize-mixin": "git@github.com:sharedlabs/app-localize-mixin.git#^1.0.0",
     "color-input": "git@github.com:sharedlabs/color-input.git",
-    "goc-styles": "git@github.com:gocast/goc-styles.git",
+    "dropdown-menu": "git@github.com:sharedlabs/dropdown-menu.git#^1.0.0",
+    "goc-apps": "git@github.com:gocast/goc-apps.git",
     "goc-icons": "git@github.com:gocast/goc-icons.git",
+    "goc-styles": "git@github.com:gocast/goc-styles.git",
+    "iron-icon": "PolymerElements/iron-icon#2.0-preview",
+    "iron-range-behavior": "PolymerElements/iron-range-behavior#2.0-preview",
+    "moment-import": "git@github.com:sharedlabs/moment-import.git",
+    "overlay-container": "git@github.com:sharedlabs/overlay-container.git",
     "paper-icon-button": "PolymerElements/paper-icon-button#^1.1.2",
-    "paper-spinner": "PolymerElements/paper-spinner#^1.2.1",
-    "iron-range-behavior": "PolymerElements/iron-range-behavior#^1.0.6",
-    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.5"
+    "paper-spinner": "PolymerElements/paper-spinner#2.0-preview",
+    "polymer": "Polymer/polymer#2.0-preview",
+    "touch-item": "git@github.com:sharedlabs/touch-item.git#^0.1.0"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "iron-component-page": "PolymerElements/iron-component-page#2.0-preview",
     "web-component-tester": "^4.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "resolutions": {
+    "webcomponentsjs": "v1",
+    "paper-styles": "2.0-preview",
+    "iron-flex-layout": "2.0-preview",
+    "iron-icon": "2.0-preview",
+    "iron-iconset-svg": "2.0-preview",
+    "paper-behaviors": "2.0-preview",
+    "iron-meta": "2.0-preview",
+    "paper-ripple": "2.0-preview",
+    "iron-behaviors": "2.0-preview",
+    "iron-checked-element-behavior": "2.0-preview",
+    "iron-a11y-keys-behavior": "2.0-preview",
+    "iron-form-element-behavior": "2.0-preview",
+    "iron-validatable-behavior": "2.0-preview",
+    "polymer": "2.0-preview"
   }
 }

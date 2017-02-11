@@ -1,8 +1,8 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../overlay-container/animated-overlay-behavior.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../overlay-container/animated-overlay-mixin.html">
 <link rel="import" href="../goc-styles/goc-styles.html">
 <link rel="import" href="../paper-spinner/paper-spinner-lite.html">
-<link rel="import" href="../color-input/color-input.html">
+<!-- <link rel="import" href="../color-input/color-input.html"> -->
 
 <!--
 `app-news-marquee-settings-overlay`
@@ -10,7 +10,7 @@
 
 <dom-module id="app-news-marquee-settings-overlay">
   <template>
-    <style include="header-layout-styles button-styles form-styles">
+    <style include="header-layout-styles button-styles form-styles icon-btn-styles">
       :host {
         background: var(--goc-background-color);
         bottom: 0;
@@ -24,39 +24,68 @@
     <div class="header-layout">
       <div class="header-layout__header">
         <div class="header-toolbar">
-          <paper-icon-button on-tap="_closeTapped" icon="close"></paper-icon-button>
+          <button
+              class="icon-btn icon-btn--primary"
+              on-click="_onBackClicked"
+              title="[[localize('SettingsPage.Header.Close')]]">
+              <iron-icon icon="arrow-back"></iron-icon>
+          </button>
+
           <div class="header-toolbar__main-content">
-            <div class="header-toolbar__title">Configuración</div>
+            <div class="header-toolbar__title">[[localize('SettingsPage.Header.Title')]]</div>
           </div>
+
           <paper-spinner-lite class="header-toolbar__spinner" active="[[loading]]"></paper-spinner-lite>
-          <button class="button" on-tap="_saveTapped">Guardar</button>
+
+          <button class="button" on-click="_onSaveTapped">[[localize('SettingsPage.Header.Button.Save')]]</button>
         </div>
       </div>
 
       <div class="header-layout__content">
         <div class="form">
           <div class="form__item">
-            <label class="form__label">Color del texto</label>
+            <label class="form__label">[[localize('SettingsPage.Options.TextColor.Label')]]</label>
             <color-input>
-              <input id="colorInput" class="form__input" placeholder="Texto" value="[[settings.color]]"/>
+              <input
+                  id="colorInput"
+                  class="form__input"
+                  placeholder="[[localize('SettingsPage.Options.TextColor.Placeholder')]]"
+                  value="[[settings.color]]"/>
             </color-input>
           </div>
 
           <div class="form__item">
-            <label class="form__label">Color de fondo</label>
+            <label class="form__label">[[localize('SettingsPage.Options.BackgroundColor.Label')]]</label>
             <color-input>
-              <input id="backgroundInput" class="form__input" placeholder="Fondo" value="[[settings.background]]" />
+              <input
+                  id="backgroundInput"
+                  class="form__input"
+                  placeholder="[[localize('SettingsPage.Options.BackgroundColor.Placeholder')]]"
+                  value="[[settings.background]]" />
             </color-input>
           </div>
 
           <div class="form__item">
-            <label class="form__label">Tamaño de la fuente</label>
-            <input id="fontSizeInput" class="form__input" type="number" placeholder="Tamaño de la fuente" value="[[settings.fontSize]]"/>
+            <label class="form__label">[[localize('SettingsPage.Options.FontSize.Label')]]</label>
+            <input
+                id="fontSizeInput"
+                class="form__input"
+                type="number"
+                placeholder="[[localize('SettingsPage.Options.FontSize.Placeholder')]]"
+                value="[[settings.fontSize]]"/>
           </div>
 
           <div class="form__item form__item--last">
-            <label class="form__label">Velocidad</label>
-            <input type="range" id="speedInput" class="form__range" min="1" max="10" step="1" value="[[settings.speed]]" on-input="_onSpeedInput">
+            <label class="form__label">[[localize('SettingsPage.Options.Speed.Label')]]</label>
+            <input
+                id="speedInput"
+                type="range"
+                class="form__range"
+                min="1"
+                max="10"
+                step="1"
+                value="[[settings.speed]]"
+                on-input="_onSpeedInput">
             <div>[[settings.speed]]</div>
           </div>
         </div>
@@ -64,79 +93,92 @@
     </div>
 
   </template>
-</dom-module>
 
-<script>
-(function() {
-  'use strict';
+  <script>
 
-  Polymer({
+    class AppNewsMarqueeSettingsOverlay extends AnimatedOverlayMixin(AppLocalizeMixin(Polymer.Element)) {
 
-    is: 'app-news-marquee-settings-overlay',
+      static get is() {return 'app-news-marquee-settings-overlay';}
 
-    properties: {
+      static get config() {
+        return {
+          properties: {
 
-      settings: {
-        type: Object,
-        value: _ => {
-          return {speed: 1};
+            settings: {
+              type: Object,
+              value: _ => {
+                return {speed: 1};
+              }
+            },
+
+            language: String,
+
+            resources: Object,
+
+            loading: {
+              type: Boolean,
+              value: false
+            },
+
+          }
+        };
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this._toggleListeners({enable: true});
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this._toggleListeners({enable: false});
+      }
+
+      _onBackClicked() {
+        requestAnimationFrame(_ => this.opened = false);
+      }
+
+      _onSaveTapped() {
+        const isValid = this._validate();
+        if (isValid) {
+          const settings = this._getFormValues();
+          this.dispatchEvent(new CustomEvent('save', {
+            composed: true,
+            detail: {settings},
+          }));
         }
-      },
-
-      loading: {
-        type: Boolean,
-        value: false
       }
 
-    },
-
-    behaviors: [
-      AnimatedOverlayBehavior
-    ],
-
-    listeners: {
-      'overlay-open-animation-finish': '_onOverlayOpenAnimationFinish'
-    },
-
-    _onOverlayOpenAnimationFinish() {
-      this.$.colorInput.focus();
-    },
-
-    _closeTapped() {
-      requestAnimationFrame(_ => {
-        this.opened = false;
-      });
-    },
-
-    _validate() {
-      return true;
-    },
-
-    _saveTapped() {
-      const isValid = this._validate();
-
-      if (isValid) {
-        const settings = this._getFormValues();
-
-        this.fire('save', {settings});
+      _onSpeedInput(event) {
+        this.set('settings.speed', event.currentTarget.value);
       }
-    },
 
-    _getFormValues() {
-      // Dynamodb AttributeValues should not contain an empty string
-      return {
-        color: this.$.colorInput.value || null,
-        background: this.$.backgroundInput.value || null,
-        fontSize: this.$.fontSizeInput.value || null,
-        speed: this.$.speedInput.value || null
-      };
-    },
+     _overlayOpenAnimationFinish() {
+        this.$.colorInput.focus();
+      }
 
-    _onSpeedInput(event) {
-      this.set('settings.speed', event.currentTarget.value);
+      _toggleListeners({enable}) {
+        const m = enable ? 'addEventListener' : 'removeEventListener';
+        this[m]('overlay-open-animation-finish', this._overlayOpenAnimationFinish);
+      }
+
+      _validate() {
+        return true;
+      }
+
+      _getFormValues() {
+        // Dynamodb AttributeValues should not contain an empty string
+        return {
+          color: this.$.colorInput.value || null,
+          background: this.$.backgroundInput.value || null,
+          fontSize: this.$.fontSizeInput.value || null,
+          speed: this.$.speedInput.value || null
+        };
+      }
+
     }
 
-  });
+    customElements.define(AppNewsMarqueeSettingsOverlay.is, AppNewsMarqueeSettingsOverlay);
 
-})();
-</script>
+  </script>
+</dom-module>
