@@ -94,36 +94,40 @@
           <h3>[[localize('EditorPage.List.Title')]]</h3>
 
           <div class="box">
-            <template id="domRepeat" is="dom-repeat" items="[[data.items]]">
-              <touch-item on-click="_onItemTapped" class$="[[_computeItemClass(index)]]">
-                <div class="news__content">
-                  <div class="news__text">[[item.text]]</div>
-                  <div class="caption">[[localize('EditorPage.List.Updated', 'date', item.date)]]</div>
-                </div>
+            <dom-repeat id="domRepeat" items="[[data.items]]">
+              <template>
+                <touch-item on-click="_onItemTapped" class$="[[_computeItemClass(index)]]">
+                  <div class="news__content">
+                    <div class="news__text">[[item.text]]</div>
+                    <div class="caption">[[localize('EditorPage.List.Updated', 'date', item.date)]]</div>
+                  </div>
 
-                <dropdown-menu-container item="[[item]]">
-                  <button
-                      class="icon-btn icon-btn--primary"
-                      title="[[localize('EditorPage.List.DotsTitle.More')]]">
-                      <iron-icon icon="dots-vertical"></iron-icon>
-                  </button>
+                  <dropdown-menu-container item="[[item]]">
+                    <button
+                        class="icon-btn icon-btn--primary"
+                        title="[[localize('EditorPage.List.DotsTitle.More')]]">
+                        <iron-icon icon="dots-vertical"></iron-icon>
+                    </button>
 
-                  <template is="dom-template">
-                    <button on-click="_onEditTapped">[[localize('EditorPage.List.Dropdown.Edit')]]</button>
-                    <button on-click="_onDeleteTapped">[[localize('EditorPage.List.Dropdown.Delete')]]</button>
-                  </template>
-                </dropdown-menu-container>
-              </touch-item>
-            </template>
+                    <template is="dom-template">
+                      <button on-click="_onEditTapped">[[localize('EditorPage.List.Dropdown.Edit')]]</button>
+                      <button on-click="_onDeleteTapped">[[localize('EditorPage.List.Dropdown.Delete')]]</button>
+                    </template>
+                  </dropdown-menu-container>
+                </touch-item>
+              </template>
+            </dom-repeat>
           </div>
         </div>
 
-        <template is="dom-if" if="[[_computeMissingWellVisible(loading, data)]]">
-          <div class="missing-well">
-            <div class="missing-well__title">[[localize('EditorPage.List.Empty.Title')]]</div>
-            <div class="missing-well__p">[[localize('EditorPage.List.Empty.Subtitle')]]</div>
-          </div>
-        </template>
+        <dom-if if="[[_computeMissingWellVisible(loading, data)]]">
+          <template>
+            <div class="missing-well">
+              <div class="missing-well__title">[[localize('EditorPage.List.Empty.Title')]]</div>
+              <div class="missing-well__p">[[localize('EditorPage.List.Empty.Subtitle')]]</div>
+            </div>
+          </template>
+        </dom-if>
       </div>
     </div>
 
@@ -132,6 +136,7 @@
   <script>
 
     class AppNewsMarquee extends AppLocalizeMixin(Polymer.Element) {
+
       static get is() {return 'app-news-marquee';}
 
       static get config() {

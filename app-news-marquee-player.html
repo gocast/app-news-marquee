@@ -1,6 +1,5 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
 `app-news-marquee`
@@ -34,101 +33,125 @@
 
     <div id="container" style$="[[_computeStyle(_settings.background, _settings.color, _settings.fontSize)]]">
       <div id="headlines">
-        <template is="dom-repeat" items="[[data.items]]">
-          <span class="headline">[[item.text]]</span>
-        </template>
+        <dom-repeat items="[[data.items]]">
+          <template>
+            <span class="headline">[[item.text]]</span>
+          </template>
+        </dom-repeat>
       </div>
     </div>
 
   </template>
-</dom-module>
 
-<script>
-(function() {
-  'use strict';
+  <script>
 
-  const defaultSettings = {
-    background: 'black',
-    color: 'white',
-    fontSize: 36,
-    speed: 5
-  };
+    class AppNewsMarqueePlayer extends AppLocalizeMixin(Polymer.Element) {
 
-  Polymer({
+      static get is() {return 'app-news-marquee-player';}
 
-    is: 'app-news-marquee-player',
+      static get config() {
+        return {
+          properties: {
 
-    behaviors: [
-      Polymer.IronResizableBehavior
-    ],
+            data: Object,
 
-    properties: {
+            _settings: {
+              type: Object,
+              value: AppNewsMarqueePlayer.defaultSettings
+            },
 
-      data: Object,
+            _isAttached: {
+              type: Boolean,
+              value: false
+            }
 
-      _settings: {
-        type: Object,
-        value: _ => {
-          return defaultSettings;
+          },
+
+          observers: [
+            '_dataChanged(data, _isAttached)'
+          ]
+        };
+      }
+
+      static defaultSettings() {
+        return {
+          background: 'black',
+          color: 'white',
+          fontSize: 36,
+          speed: 5
+        };
+      }
+
+      constructor() {
+        super();
+        this._documentResized = this._documentResized.bind(this);
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        requestAnimationFrame(_ => this._toggleListeners(true));
+        this._isAttached = true;
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        requestAnimationFrame(_ => this._toggleListeners(false));
+        this._isAttached = false;
+      }
+
+      _documentResized() {
+        this._animate();
+      }
+
+      _dataChanged(data) {
+        if (data) {
+          this._updateSettings();
+          this._animate();
         }
       }
 
-    },
-
-    observers: [
-      '_dataChanged(data, isAttached)'
-    ],
-
-    listeners: {
-      'iron-resize': '_onIronResize'
-    },
-
-    _dataChanged(data) {
-      if (data) {
-        this._updateSettings();
-        this._animate();
-      }
-    },
-
-    _animate() {
-      if (!this.data || !this.data.items) {
-        return;
+      _toggleListeners(enable) {
+        const m = enable ? 'addEventListener' : 'removeEventListener';
+        document[m]('resize', this._documentResized);
       }
 
-      const rect = this.getBoundingClientRect();
-      const durationFactor = Math.min(this.data.items.length * 3000, 16000);
-      const duration = (10 - Number(this._settings.speed)) * durationFactor;
+      _animate() {
+        if (!this.data || !this.data.items) {
+          return;
+        }
 
-      if (this._animation) {
-        this._animation.cancel();
-      }
+        const rect = this.getBoundingClientRect();
+        const durationFactor = Math.min(this.data.items.length * 3000, 16000);
+        const duration = (10 - Number(this._settings.speed)) * durationFactor;
 
-      requestAnimationFrame(_ => {
-        this._animation = this.$.headlines.animate([
-          {transform: `translateX(${rect.width}px)`},
-          {transform: 'translateX(-100%)'}
-        ], {
-          duration,
-          iterations: Infinity
+        if (this._animation) {
+          this._animation.cancel();
+        }
+
+        requestAnimationFrame(_ => {
+          this._animation = this.$.headlines.animate([
+            {transform: `translateX(${rect.width}px)`},
+            {transform: 'translateX(-100%)'}
+          ], {
+            duration,
+            iterations: Infinity
+          });
         });
-      });
-    },
-
-    _updateSettings() {
-      if (this.data) {
-        this._settings = Object.assign({}, defaultSettings, this.data.settings);
       }
-    },
 
-    _onIronResize() {
-      this._animate();
-    },
+      _updateSettings() {
+        if (this.data) {
+          this._settings = Object.assign({}, defaultSettings, this.data.settings);
+        }
+      }
 
-    _computeStyle(background, color, fontSize) {
-      return `background: ${background}; color: ${color}; font-size: ${fontSize}px;`;
+      _computeStyle(background, color, fontSize) {
+        return `background: ${background}; color: ${color}; font-size: ${fontSize}px;`;
+      }
+
     }
 
-  });
+    customElements.define(AppNewsMarqueePlayer.is, AppNewsMarqueePlayer);
 
-})();
-</script>
+  </script>
+</dom-module>
