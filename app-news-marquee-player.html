@@ -84,7 +84,7 @@
 
       constructor() {
         super();
-        this._documentResized = this._documentResized.bind(this);
+        this._windowResized = this._windowResized.bind(this);
       }
 
       connectedCallback() {
@@ -99,7 +99,7 @@
         this._isAttached = false;
       }
 
-      _documentResized() {
+      _windowResized() {
         this._animate();
       }
 
@@ -112,7 +112,7 @@
 
       _toggleListeners(enable) {
         const m = enable ? 'addEventListener' : 'removeEventListener';
-        document[m]('resize', this._documentResized);
+        window[m]('resize', this._windowResized);
       }
 
       _animate() {
