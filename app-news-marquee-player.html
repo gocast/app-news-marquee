@@ -45,6 +45,15 @@
 
   <script>
 
+  (() => {
+
+    const DEFAULT_SETTINGS = {
+      background: 'black',
+      color: 'white',
+      fontSize: 36,
+      speed: 5
+    };
+
     class AppNewsMarqueePlayer extends AppLocalizeMixin(Polymer.Element) {
 
       static get is() {return 'app-news-marquee-player';}
@@ -57,28 +66,19 @@
 
             _settings: {
               type: Object,
-              value: AppNewsMarqueePlayer.defaultSettings
+              value: DEFAULT_SETTINGS
             },
 
             _isAttached: {
               type: Boolean,
               value: false
-            }
+            },
 
           },
 
           observers: [
             '_dataChanged(data, _isAttached)'
           ]
-        };
-      }
-
-      static defaultSettings() {
-        return {
-          background: 'black',
-          color: 'white',
-          fontSize: 36,
-          speed: 5
         };
       }
 
@@ -141,7 +141,7 @@
 
       _updateSettings() {
         if (this.data) {
-          this._settings = Object.assign({}, defaultSettings, this.data.settings);
+          this._settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
         }
       }
 
@@ -152,6 +152,8 @@
     }
 
     customElements.define(AppNewsMarqueePlayer.is, AppNewsMarqueePlayer);
+
+  })();
 
   </script>
 </dom-module>
