@@ -23,10 +23,17 @@
 
       #headlines {
         white-space: nowrap;
+        opacity: 0;
+      }
+
+      #sizes {
+        white-space: nowrap;
+        position: absolute;
+        opacity: 0;
       }
 
       .headline {
-        margin-right: 200px;
+        margin-right: 20px;
       }
 
     </style>
@@ -39,7 +46,10 @@
           </template>
         </dom-repeat>
       </div>
+
+      <div id="sizes"></div>
     </div>
+
 
   </template>
 
@@ -103,8 +113,8 @@
         this._animate();
       }
 
-      _dataChanged(data) {
-        if (data) {
+      _dataChanged(data, isAttached) {
+        if (data && isAttached) {
           this._updateSettings();
           this._animate();
         }
@@ -120,22 +130,55 @@
           return;
         }
 
-        const rect = this.getBoundingClientRect();
-        const durationFactor = Math.min(this.data.items.length * 3000, 16000);
-        const duration = (10 - Number(this._settings.speed)) * durationFactor;
+        this._calculateScreenTextSize(this.data.items).then(textSize => {
+          const containerWidth = this.getBoundingClientRect().width;
+          const duration = Math.round(1/Number(this._settings.speed) *
+            (textSize + containerWidth) * 30);
 
-        if (this._animation) {
-          this._animation.cancel();
-        }
+          if (this._animation) {
+            this._animation.cancel();
+          }
 
-        requestAnimationFrame(_ => {
-          this._animation = this.$.headlines.animate([
-            {transform: `translateX(${rect.width}px)`},
-            {transform: 'translateX(-100%)'}
-          ], {
-            duration,
-            iterations: Infinity
+          requestAnimationFrame(_ => {
+            this._animation = this.$.headlines.animate([
+              {transform: `translate3d(${containerWidth}px, 0, 0)`, opacity: 1},
+              {transform: 'translate3d(-100%, 0, 0)', opacity: 1}
+            ], {
+              duration,
+              iterations: Infinity
+            });
           });
+        });
+      }
+
+      _calculateScreenTextSize(items) {
+        return new Promise(resolve => {
+          const frag = document.createDocumentFragment();
+          const sizesContainer = this.$.sizes;
+          var scheduleInterval = 16;
+
+          items.forEach(i => {
+            const span = document.createElement('span');
+            span.className = 'headline';
+            span.innerHTML = i.text;
+            frag.appendChild(span);
+          });
+          sizesContainer.innerHTML = '';
+          sizesContainer.appendChild(frag);
+
+          const computeWidth = _ => {
+            requestAnimationFrame(_ => {
+              const width = sizesContainer.offsetWidth;
+              if (!width) {
+                scheduleInterval += 16;
+                scheduleCompute();
+              } else {
+                resolve(width);
+              }
+            });
+          };
+          const scheduleCompute = _ => setTimeout(computeWidth, scheduleInterval);
+          scheduleCompute();
         });
       }
 
