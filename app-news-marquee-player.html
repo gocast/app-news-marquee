@@ -55,148 +55,149 @@
 
   <script>
 
-  (() => {
+  class AppNewsMarqueePlayer extends AppLocalizeMixin(Polymer.Element) {
 
-    const DEFAULT_SETTINGS = {
-      background: 'black',
-      color: 'white',
-      fontSize: 36,
-      speed: 5
-    };
+    static get is() {return 'app-news-marquee-player';}
 
-    class AppNewsMarqueePlayer extends AppLocalizeMixin(Polymer.Element) {
+    static get config() {
+      return {
+        properties: {
 
-      static get is() {return 'app-news-marquee-player';}
+          data: Object,
 
-      static get config() {
-        return {
-          properties: {
-
-            data: Object,
-
-            _settings: {
-              type: Object,
-              value: DEFAULT_SETTINGS
-            },
-
-            _isAttached: {
-              type: Boolean,
-              value: false
-            },
-
+          _defaultSettings: {
+            type: Object,
+            value: _ => {
+              return {
+                background: 'black',
+                color: 'white',
+                fontSize: 36,
+                speed: 5
+              };
+            }
           },
 
-          observers: [
-            '_dataChanged(data, _isAttached)'
-          ]
-        };
-      }
+          _settings: {
+            type: Object,
+          },
 
-      constructor() {
-        super();
-        this._windowResized = this._windowResized.bind(this);
-      }
+          _isAttached: {
+            type: Boolean,
+            value: false
+          },
 
-      connectedCallback() {
-        super.connectedCallback();
-        requestAnimationFrame(_ => this._toggleListeners(true));
-        this._isAttached = true;
-      }
+        },
 
-      disconnectedCallback() {
-        super.disconnectedCallback();
-        requestAnimationFrame(_ => this._toggleListeners(false));
-        this._isAttached = false;
-      }
-
-      _windowResized() {
-        this._animate();
-      }
-
-      _dataChanged(data, isAttached) {
-        if (data && isAttached) {
-          this._updateSettings();
-          this._animate();
-        }
-      }
-
-      _toggleListeners(enable) {
-        const m = enable ? 'addEventListener' : 'removeEventListener';
-        window[m]('resize', this._windowResized);
-      }
-
-      _animate() {
-        if (!this.data || !this.data.items) {
-          return;
-        }
-
-        this._calculateScreenTextSize(this.data.items).then(textSize => {
-          const containerWidth = this.getBoundingClientRect().width;
-          const duration = Math.round(1/Number(this._settings.speed) *
-            (textSize + containerWidth) * 30);
-
-          if (this._animation) {
-            this._animation.cancel();
-          }
-
-          requestAnimationFrame(_ => {
-            this._animation = this.$.headlines.animate([
-              {transform: `translate3d(${containerWidth}px, 0, 0)`, opacity: 1},
-              {transform: 'translate3d(-100%, 0, 0)', opacity: 1}
-            ], {
-              duration,
-              iterations: Infinity
-            });
-          });
-        });
-      }
-
-      _calculateScreenTextSize(items) {
-        return new Promise(resolve => {
-          const frag = document.createDocumentFragment();
-          const sizesContainer = this.$.sizes;
-          var scheduleInterval = 16;
-
-          items.forEach(i => {
-            const span = document.createElement('span');
-            span.className = 'headline';
-            span.innerHTML = i.text;
-            frag.appendChild(span);
-          });
-          sizesContainer.innerHTML = '';
-          sizesContainer.appendChild(frag);
-
-          const computeWidth = _ => {
-            requestAnimationFrame(_ => {
-              const width = sizesContainer.offsetWidth;
-              if (!width) {
-                scheduleInterval += 16;
-                scheduleCompute();
-              } else {
-                resolve(width);
-              }
-            });
-          };
-          const scheduleCompute = _ => setTimeout(computeWidth, scheduleInterval);
-          scheduleCompute();
-        });
-      }
-
-      _updateSettings() {
-        if (this.data) {
-          this._settings = Object.assign({}, DEFAULT_SETTINGS, this.data.settings);
-        }
-      }
-
-      _computeStyle(background, color, fontSize) {
-        return `background: ${background}; color: ${color}; font-size: ${fontSize}px;`;
-      }
-
+        observers: [
+          '_dataChanged(data, _isAttached)'
+        ]
+      };
     }
 
-    customElements.define(AppNewsMarqueePlayer.is, AppNewsMarqueePlayer);
+    constructor() {
+      super();
+      this._windowResized = this._windowResized.bind(this);
+    }
 
-  })();
+    connectedCallback() {
+      super.connectedCallback();
+      requestAnimationFrame(_ => this._toggleListeners(true));
+      this._isAttached = true;
+    }
+
+    disconnectedCallback() {
+      super.disconnectedCallback();
+      requestAnimationFrame(_ => this._toggleListeners(false));
+      this._isAttached = false;
+    }
+
+    _windowResized() {
+      this._animate();
+    }
+
+    _dataChanged(data, isAttached) {
+      if (data && isAttached) {
+        this._updateSettings();
+        this._animate();
+      }
+    }
+
+    _toggleListeners(enable) {
+      const m = enable ? 'addEventListener' : 'removeEventListener';
+      window[m]('resize', this._windowResized);
+    }
+
+    _animate() {
+      if (!this.data || !this.data.items) {
+        return;
+      }
+
+      this._calculateScreenTextSize(this.data.items).then(textSize => {
+        const containerWidth = this.getBoundingClientRect().width;
+        const duration = Math.round(1/Number(this._settings.speed) *
+          (textSize + containerWidth) * 30);
+
+        if (this._animation) {
+          this._animation.cancel();
+        }
+
+        requestAnimationFrame(_ => {
+          this._animation = this.$.headlines.animate([
+            {transform: `translate3d(${containerWidth}px, 0, 0)`, opacity: 1},
+            {transform: 'translate3d(-100%, 0, 0)', opacity: 1}
+          ], {
+            duration,
+            iterations: Infinity
+          });
+        });
+      });
+    }
+
+    _calculateScreenTextSize(items) {
+      return new Promise(resolve => {
+        const frag = document.createDocumentFragment();
+        const sizesContainer = this.$.sizes;
+        var scheduleInterval = 16;
+
+        items.forEach(i => {
+          const span = document.createElement('span');
+          span.className = 'headline';
+          span.innerHTML = i.text;
+          frag.appendChild(span);
+        });
+        sizesContainer.innerHTML = '';
+        sizesContainer.appendChild(frag);
+
+        const computeWidth = _ => {
+          requestAnimationFrame(_ => {
+            const width = sizesContainer.offsetWidth;
+            if (!width) {
+              scheduleInterval += 16;
+              scheduleCompute();
+            } else {
+              resolve(width);
+            }
+          });
+        };
+        const scheduleCompute = _ => setTimeout(computeWidth, scheduleInterval);
+        scheduleCompute();
+      });
+    }
+
+    _updateSettings() {
+      if (this.data) {
+        this._settings = Object.assign({}, this._defaultSettings, this.data.settings);
+      }
+    }
+
+    _computeStyle(background, color, fontSize) {
+      return `background: ${background}; color: ${color}; font-size: ${fontSize}px;`;
+    }
+
+  }
+
+  customElements.define(AppNewsMarqueePlayer.is, AppNewsMarqueePlayer);
+
 
   </script>
 </dom-module>

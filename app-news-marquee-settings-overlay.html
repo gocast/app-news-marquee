@@ -49,6 +49,7 @@
               <input
                   id="colorInput"
                   class="form__input"
+                  disabled="[[loading]]"
                   placeholder="[[localize('SettingsPage.Options.TextColor.Placeholder')]]"
                   value="[[settings.color]]"/>
             </color-input>
@@ -60,6 +61,7 @@
               <input
                   id="backgroundInput"
                   class="form__input"
+                  disabled="[[loading]]"
                   placeholder="[[localize('SettingsPage.Options.BackgroundColor.Placeholder')]]"
                   value="[[settings.background]]" />
             </color-input>
@@ -70,6 +72,7 @@
             <input
                 id="fontSizeInput"
                 class="form__input"
+                disabled="[[loading]]"
                 type="number"
                 placeholder="[[localize('SettingsPage.Options.FontSize.Placeholder')]]"
                 value="[[settings.fontSize]]"/>
@@ -81,6 +84,7 @@
                 id="speedInput"
                 type="range"
                 class="form__range"
+                disabled="[[loading]]"
                 min="1"
                 max="10"
                 step="1"

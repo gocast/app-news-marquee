@@ -147,6 +147,19 @@
               type: Object,
               value: _ => {
                 return {items: []};
+              },
+              observer: '_dataChanged',
+            },
+
+            _defaultSettings: {
+              type: Object,
+              value: _ => {
+                return {
+                  background: 'black',
+                  color: 'white',
+                  fontSize: 36,
+                  speed: 5
+                };
               }
             },
 
@@ -162,7 +175,8 @@
 
             loading: {
               type: Boolean,
-              value: false
+              value: false,
+              observer: '_loadingChanged'
             },
 
             language: {
@@ -236,6 +250,20 @@
           },
 
         };
+      }
+
+      _dataChanged(data) {
+        if (data && data.settings) {
+          if (this._settingsOverlay) {
+            this._settingsOverlay.settings = data.settings;
+          }
+        }
+      }
+
+      _loadingChanged(loading) {
+        if (this._settingsOverlay) {
+          this._settingsOverlay.loading = loading;
+        }
       }
 
       _onBackClicked() {
@@ -312,15 +340,14 @@
         }
 
         const overlay = document.createElement('app-news-marquee-settings-overlay');
-        overlay.open();
         overlay.language = this.language;
         overlay.resources = this.resources;
+        overlay.loading = this.loading;
+        overlay.settings = this.data.settings || this._defaultSettings;
         overlay.onDetach = _ => this._settingsOverlay = null;
         overlay.addEventListener('save', this._settingsUpdated.bind(this));
-        if (this.data.settings) {
-          overlay.settings = this.data.settings;
-        }
         this._settingsOverlay = overlay;
+        overlay.open()
       }
 
       _openPublishOverlay(item) {
