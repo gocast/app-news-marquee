@@ -145,10 +145,13 @@
 
             data: {
               type: Object,
+              observer: '_dataChanged',
+            },
+
+            _defaultData: {
               value: _ => {
                 return {items: []};
               },
-              observer: '_dataChanged',
             },
 
             _defaultSettings: {
@@ -253,6 +256,11 @@
       }
 
       _dataChanged(data) {
+        // Initialize data.
+        if (!data) {
+          this.data = Object.assign({}, this._defaultData);
+        }
+
         if (data && data.settings) {
           if (this._settingsOverlay) {
             this._settingsOverlay.settings = data.settings;
