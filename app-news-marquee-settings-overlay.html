@@ -10,7 +10,7 @@
 
 <dom-module id="app-news-marquee-settings-overlay">
   <template>
-    <style include="header-layout-styles btn-styles form-styles icon-btn-styles">
+    <style include="header-layout-styles box-styles btn-styles form-styles icon-btn-styles">
       :host {
         background: var(--goc-background-color);
         bottom: 0;
@@ -44,7 +44,7 @@
       </div>
 
       <div class="header-layout__content">
-        <div class="form">
+        <div class="form box">
           <div class="form__item">
             <label class="form__label">[[localize('SettingsPage.Options.TextColor.Label')]]</label>
             <color-input>
