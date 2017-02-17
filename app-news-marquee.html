@@ -34,7 +34,7 @@
         padding: 20px 0;
       }
 
-      .box__item {
+      .box__row {
         @apply(--layout-horizontal);
       }
 
@@ -61,7 +61,7 @@
               class="icon-btn icon-btn--primary"
               on-click="_onBackClicked"
               title="[[localize('EditorPage.Header.BackButton')]]">
-              <touch-item><iron-icon icon="arrow-back"></iron-icon></touch-item>
+            <touch-item><iron-icon icon="arrow-back"></iron-icon></touch-item>
           </button>
 
           <goc-app-icon size="small" app-name="news-marquee"></goc-app-icon>
@@ -77,45 +77,49 @@
               class="icon-btn icon-btn--primary"
               on-click="_onAddTapped"
               title="[[localize('EditorPage.Header.AddButton')]]">
-              <touch-item><iron-icon icon="message-plus"></iron-icon></touch-item>
+            <touch-item><iron-icon icon="message-plus"></iron-icon></touch-item>
           </button>
 
           <button
               class="icon-btn icon-btn--primary"
               on-click="_onSettingsTapped"
               title="[[localize('EditorPage.Header.OptionsButton')]]">
-              <touch-item><iron-icon icon="brush"></iron-icon></touch-item>
+            <touch-item><iron-icon icon="brush"></iron-icon></touch-item>
           </button>
         </div>
       </div>
 
       <div class="header-layout__content">
         <div hidden$="[[!data.items.length]]">
-          <h3>[[localize('EditorPage.List.Title')]]</h3>
+          <h3 class="headline">[[localize('EditorPage.List.Title')]]</h3>
 
           <div class="box">
             <dom-repeat id="domRepeat" items="[[data.items]]">
+
               <template>
-                <touch-item on-click="_onItemTapped" class$="[[_computeItemClass(index)]]">
-                  <div class="news__content">
-                    <div class="news__text">[[item.text]]</div>
-                    <div class="caption">[[localize('EditorPage.List.Updated', 'date', item.date)]]</div>
+                <touch-item on-click="_onItemTapped">
+                  <div class$="[[_computeItemClass(index)]]">
+                    <div class="news__content">
+                      <div class="news__text">[[item.text]]</div>
+                      <div class="caption">[[localize('EditorPage.List.Updated', 'date', item.date)]]</div>
+                    </div>
+
+                    <dropdown-menu-container item="[[item]]">
+                      <button
+                          class="icon-btn"
+                          title="[[localize('EditorPage.List.DotsTitle.More')]]">
+                        <touch-item><iron-icon icon="dots-vertical"></iron-icon></touch-item>
+                      </button>
+
+                      <template is="dom-template">
+                        <button on-click="_onEditTapped">[[localize('EditorPage.List.Dropdown.Edit')]]</button>
+                        <button on-click="_onDeleteTapped">[[localize('EditorPage.List.Dropdown.Delete')]]</button>
+                      </template>
+                    </dropdown-menu-container>
                   </div>
-
-                  <dropdown-menu-container item="[[item]]">
-                    <button
-                        class="icon-btn icon-btn--primary"
-                        title="[[localize('EditorPage.List.DotsTitle.More')]]">
-                        <iron-icon icon="dots-vertical"></iron-icon>
-                    </button>
-
-                    <template is="dom-template">
-                      <button on-click="_onEditTapped">[[localize('EditorPage.List.Dropdown.Edit')]]</button>
-                      <button on-click="_onDeleteTapped">[[localize('EditorPage.List.Dropdown.Delete')]]</button>
-                    </template>
-                  </dropdown-menu-container>
                 </touch-item>
               </template>
+
             </dom-repeat>
           </div>
         </div>
@@ -367,10 +371,10 @@
       }
 
       _computeItemClass(index) {
-        let classNames = 'box__item';
+        let classNames = 'box__row';
 
         if (index === this.data.items.length - 1) {
-          classNames += ' box__item--last';
+          classNames += ' box__row--last';
         }
         return classNames;
       }
