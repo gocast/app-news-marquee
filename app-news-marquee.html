@@ -89,6 +89,7 @@
         </div>
       </div>
 
+
       <div class="header-layout__content">
         <div hidden$="[[!data.items.length]]">
           <h3 class="headline">[[localize('EditorPage.List.Title')]]</h3>
@@ -147,27 +148,24 @@
         return {
           properties: {
 
-            data: {
-              type: Object,
-              observer: '_dataChanged',
-            },
-
             _defaultData: {
-              value: _ => {
-                return {items: []};
-              },
-            },
-
-            _defaultSettings: {
               type: Object,
               value: _ => {
                 return {
-                  background: 'black',
-                  color: 'white',
-                  fontSize: 36,
-                  speed: 5
+                  items: [],
+                  settings: {
+                    background: 'black',
+                    color: 'white',
+                    fontSize: 36,
+                    speed: 5
+                  }
                 };
-              }
+              },
+            },
+
+            data: {
+              type: Object,
+              observer: '_dataChanged',
             },
 
             release: Object,
@@ -260,8 +258,7 @@
       }
 
       _dataChanged(data) {
-        // Initialize data.
-        if (!data) {
+        if (data === null) {
           this.data = Object.assign({}, this._defaultData);
         }
 
@@ -355,7 +352,7 @@
         overlay.language = this.language;
         overlay.resources = this.resources;
         overlay.loading = this.loading;
-        overlay.settings = this.data.settings || this._defaultSettings;
+        overlay.settings = this.data.settings;
         overlay.onDetach = _ => this._settingsOverlay = null;
         overlay.addEventListener('save', this._settingsUpdated.bind(this));
         this._settingsOverlay = overlay;
