@@ -59,39 +59,37 @@
 
     static get is() {return 'app-news-marquee-player';}
 
-    static get config() {
+    static get properties() {
       return {
-        properties: {
+        data: Object,
 
-          data: Object,
-
-          _defaultSettings: {
-            type: Object,
-            value: _ => {
-              return {
-                background: 'black',
-                color: 'white',
-                fontSize: 36,
-                speed: 5
-              };
-            }
-          },
-
-          _settings: {
-            type: Object,
-          },
-
-          _isAttached: {
-            type: Boolean,
-            value: false
-          },
-
+        _defaultSettings: {
+          type: Object,
+          value: _ => {
+            return {
+              background: 'black',
+              color: 'white',
+              fontSize: 36,
+              speed: 5
+            };
+          }
         },
 
-        observers: [
-          '_dataChanged(data, _isAttached)'
-        ]
+        _settings: {
+          type: Object,
+        },
+
+        _isAttached: {
+          type: Boolean,
+          value: false
+        },
       };
+    }
+
+    static get observers() {
+      return [
+        '_dataChanged(data, _isAttached)'
+      ];
     }
 
     constructor() {

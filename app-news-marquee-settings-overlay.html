@@ -106,27 +106,23 @@
 
       static get is() {return 'app-news-marquee-settings-overlay';}
 
-      static get config() {
+      static get properties() {
         return {
-          properties: {
+          settings: {
+            type: Object,
+            value: _ => {
+              return {speed: 1};
+            }
+          },
 
-            settings: {
-              type: Object,
-              value: _ => {
-                return {speed: 1};
-              }
-            },
+          language: String,
 
-            language: String,
+          resources: Object,
 
-            resources: Object,
-
-            loading: {
-              type: Boolean,
-              value: false
-            },
-
-          }
+          loading: {
+            type: Boolean,
+            value: false
+          },
         };
       }
 

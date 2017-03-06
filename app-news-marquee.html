@@ -144,116 +144,111 @@
 
       static get is() {return 'app-news-marquee';}
 
-      static get config() {
+      static get properties() {
         return {
-          properties: {
-
-            _defaultData: {
-              type: Object,
-              value: _ => {
-                return {
-                  items: [],
-                  settings: {
-                    background: 'black',
-                    color: 'white',
-                    fontSize: 36,
-                    speed: 5
-                  }
-                };
-              },
+          _defaultData: {
+            type: Object,
+            value: _ => {
+              return {
+                items: [],
+                settings: {
+                  background: 'black',
+                  color: 'white',
+                  fontSize: 36,
+                  speed: 5
+                }
+              };
             },
-
-            data: {
-              type: Object,
-              observer: '_dataChanged',
-            },
-
-            release: Object,
-
-            contentId: Number,
-
-            dataUpdatedAt: Number,
-
-            releaseUpdatedAt: Number,
-
-            contentName: String,
-
-            loading: {
-              type: Boolean,
-              value: false,
-              observer: '_loadingChanged'
-            },
-
-            language: {
-              type: String,
-              value: _ => 'en'
-            },
-
-            resources: {
-              type: Object,
-              value() {
-                return {
-                  en: {
-                    'EditorPage.Header.AddButton': 'Add news item',
-                    'EditorPage.Header.BackButton': 'Back',
-                    'EditorPage.Header.OptionsButton': 'Options',
-                    'EditorPage.List.DotsTitle.More': 'More options',
-                    'EditorPage.List.Dropdown.Delete': 'Delete',
-                    'EditorPage.List.Dropdown.Edit': 'Edit',
-                    'EditorPage.List.Empty.Subtitle': 'Click on the "+" icon at the top right of the screen',
-                    'EditorPage.List.Empty.Title': `You haven't added any news yet!`,
-                    'EditorPage.List.Title': 'Published news',
-                    'EditorPage.List.Updated': '{date, date, short} {date, time, short}',
-                    'PublishPage.Header.Add': 'Add',
-                    'PublishPage.Header.AddTitle': 'Add new',
-                    'PublishPage.Header.Close': 'Close',
-                    'PublishPage.Header.EditTitle': 'Edit new',
-                    'PublishPage.Textarea.Placeholder': 'Write here...',
-                    'SettingsPage.Header.Button.Save': 'Save',
-                    'SettingsPage.Header.Close': 'Close',
-                    'SettingsPage.Header.Title': 'Configuration',
-                    'SettingsPage.Options.BackgroundColor.Label': 'Background color',
-                    'SettingsPage.Options.BackgroundColor.Placeholder': 'Hex, Rgb, Rgba ...',
-                    'SettingsPage.Options.FontSize.Label': 'Font size',
-                    'SettingsPage.Options.FontSize.Placeholder': `In px's`,
-                    'SettingsPage.Options.Speed.Label': 'Speed',
-                    'SettingsPage.Options.TextColor.Label': 'Text color',
-                    'SettingsPage.Options.TextColor.Placeholder': 'Hex, Rgb, Rgba ...',
-                  },
-
-                  es: {
-                    'EditorPage.Header.AddButton': 'Añadir noticia',
-                    'EditorPage.Header.BackButton': 'Atrás',
-                    'EditorPage.Header.OptionsButton': 'Opciones',
-                    'EditorPage.List.DotsTitle.More': 'Mas opciones',
-                    'EditorPage.List.Dropdown.Delete': 'Borrar',
-                    'EditorPage.List.Dropdown.Edit': 'Editar',
-                    'EditorPage.List.Empty.Subtitle': 'Añade noticias haciendo click en el icono "+" en la esquina superior derecha de la pantalla.',
-                    'EditorPage.List.Empty.Title': 'Aun no has añadido ningun noticia!',
-                    'EditorPage.List.Title': 'Noticias publicadas',
-                    'EditorPage.List.Updated': '{date, date, short} {date, time, short}',
-                    'PublishPage.Header.Add': 'Añadir',
-                    'PublishPage.Header.AddTitle': 'Añadir noticia',
-                    'PublishPage.Header.Close': 'Cerrar',
-                    'PublishPage.Header.EditTitle': 'Editar noticia',
-                    'PublishPage.Textarea.Placeholder': 'Escribe aquí...',
-                    'SettingsPage.Header.Button.Save': 'Guardar',
-                    'SettingsPage.Header.Close': 'Cerrar',
-                    'SettingsPage.Header.Title': 'Configuración',
-                    'SettingsPage.Options.BackgroundColor.Label': 'Color del fondo',
-                    'SettingsPage.Options.BackgroundColor.Placeholder': 'Hex, Rgb, Rgba ...',
-                    'SettingsPage.Options.FontSize.Label': 'Tamaño de la fuente',
-                    'SettingsPage.Options.FontSize.Placeholder': 'En px',
-                    'SettingsPage.Options.Speed.Label': 'Velocidad',
-                    'SettingsPage.Options.TextColor.Label': 'Color del texto',
-                    'SettingsPage.Options.TextColor.Placeholder': 'Hex, Rgb, Rgba ...',
-                  }
-                };
-              }
-            },
-
           },
 
+          data: {
+            type: Object,
+            observer: '_dataChanged',
+          },
+
+          release: Object,
+
+          contentId: Number,
+
+          dataUpdatedAt: Number,
+
+          releaseUpdatedAt: Number,
+
+          contentName: String,
+
+          loading: {
+            type: Boolean,
+            value: false,
+            observer: '_loadingChanged'
+          },
+
+          language: {
+            type: String,
+            value: _ => 'en'
+          },
+
+          resources: {
+            type: Object,
+            value() {
+              return {
+                en: {
+                  'EditorPage.Header.AddButton': 'Add news item',
+                  'EditorPage.Header.BackButton': 'Back',
+                  'EditorPage.Header.OptionsButton': 'Options',
+                  'EditorPage.List.DotsTitle.More': 'More options',
+                  'EditorPage.List.Dropdown.Delete': 'Delete',
+                  'EditorPage.List.Dropdown.Edit': 'Edit',
+                  'EditorPage.List.Empty.Subtitle': 'Click on the "+" icon at the top right of the screen',
+                  'EditorPage.List.Empty.Title': `You haven't added any news yet!`,
+                  'EditorPage.List.Title': 'Published news',
+                  'EditorPage.List.Updated': '{date, date, short} {date, time, short}',
+                  'PublishPage.Header.Add': 'Add',
+                  'PublishPage.Header.AddTitle': 'Add new',
+                  'PublishPage.Header.Close': 'Close',
+                  'PublishPage.Header.EditTitle': 'Edit new',
+                  'PublishPage.Textarea.Placeholder': 'Write here...',
+                  'SettingsPage.Header.Button.Save': 'Save',
+                  'SettingsPage.Header.Close': 'Close',
+                  'SettingsPage.Header.Title': 'Configuration',
+                  'SettingsPage.Options.BackgroundColor.Label': 'Background color',
+                  'SettingsPage.Options.BackgroundColor.Placeholder': 'Hex, Rgb, Rgba ...',
+                  'SettingsPage.Options.FontSize.Label': 'Font size',
+                  'SettingsPage.Options.FontSize.Placeholder': `In px's`,
+                  'SettingsPage.Options.Speed.Label': 'Speed',
+                  'SettingsPage.Options.TextColor.Label': 'Text color',
+                  'SettingsPage.Options.TextColor.Placeholder': 'Hex, Rgb, Rgba ...',
+                },
+
+                es: {
+                  'EditorPage.Header.AddButton': 'Añadir noticia',
+                  'EditorPage.Header.BackButton': 'Atrás',
+                  'EditorPage.Header.OptionsButton': 'Opciones',
+                  'EditorPage.List.DotsTitle.More': 'Mas opciones',
+                  'EditorPage.List.Dropdown.Delete': 'Borrar',
+                  'EditorPage.List.Dropdown.Edit': 'Editar',
+                  'EditorPage.List.Empty.Subtitle': 'Añade noticias haciendo click en el icono "+" en la esquina superior derecha de la pantalla.',
+                  'EditorPage.List.Empty.Title': 'Aun no has añadido ningun noticia!',
+                  'EditorPage.List.Title': 'Noticias publicadas',
+                  'EditorPage.List.Updated': '{date, date, short} {date, time, short}',
+                  'PublishPage.Header.Add': 'Añadir',
+                  'PublishPage.Header.AddTitle': 'Añadir noticia',
+                  'PublishPage.Header.Close': 'Cerrar',
+                  'PublishPage.Header.EditTitle': 'Editar noticia',
+                  'PublishPage.Textarea.Placeholder': 'Escribe aquí...',
+                  'SettingsPage.Header.Button.Save': 'Guardar',
+                  'SettingsPage.Header.Close': 'Cerrar',
+                  'SettingsPage.Header.Title': 'Configuración',
+                  'SettingsPage.Options.BackgroundColor.Label': 'Color del fondo',
+                  'SettingsPage.Options.BackgroundColor.Placeholder': 'Hex, Rgb, Rgba ...',
+                  'SettingsPage.Options.FontSize.Label': 'Tamaño de la fuente',
+                  'SettingsPage.Options.FontSize.Placeholder': 'En px',
+                  'SettingsPage.Options.Speed.Label': 'Velocidad',
+                  'SettingsPage.Options.TextColor.Label': 'Color del texto',
+                  'SettingsPage.Options.TextColor.Placeholder': 'Hex, Rgb, Rgba ...',
+                }
+              };
+            }
+          },
         };
       }
 

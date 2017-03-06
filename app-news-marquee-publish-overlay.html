@@ -79,22 +79,18 @@
 
       static get is() {return 'app-news-marquee-publish-overlay';}
 
-      static get config() {
+      static get properties() {
         return {
-          properties: {
+          text: String,
 
-            text: String,
+          language: String,
 
-            language: String,
+          resources: Object,
 
-            resources: Object,
-
-            loading: {
-              type: Boolean,
-              value: false
-            },
-
-          }
+          loading: {
+            type: Boolean,
+            value: false
+          },
         };
       }
 
