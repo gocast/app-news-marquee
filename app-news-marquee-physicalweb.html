@@ -1,0 +1,84 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../goc-styles/goc-styles.html">
+<link rel="import" href="../goc-icons/goc-icons.html">
+<link rel="import" href="../goc-apps/goc-app-icon.html">
+<link rel="import" href="../momoent/goc-app-icon.html">
+<link rel="import" href="../moment-import/moment-with-locales.html">
+
+<dom-module id="app-news-marquee-physicalweb">
+  <template>
+    <style include="header-layout-styles btn-styles icon-btn-styles">
+      :host {
+        display: block;
+        height: 100%;
+        padding: 0 25px;
+      }
+
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .news__item {
+        border-bottom: solid 1px #ddd;
+        padding: 10px 0;
+      }
+
+      .news__item__addedat {
+        font-weight: 300;
+        color: #888;
+        margin-top: 3px;
+        font-size: 13px;
+      }
+
+    </style>
+
+    <goc-apps-collection
+        app-name="restaurant-menu"
+        item="{{_appInfo}}"
+        language="[[language]]"></goc-apps-collection>
+
+    <ul class="news">
+      <dom-repeat items="[[data.items]]">
+        <template>
+          <li class="news__item">
+            <div class="news__item__text">[[item.text]]</div>
+            <div class="news__item__addedat">[[_computeDate(item.date)]]</div>
+          </li>
+        </template>
+      </dom-repeat>
+    </ul>
+
+  </template>
+  <script>
+
+    class AppNewsMarqueePhysicalweb extends Polymer.Element {
+
+      static get is() {return 'app-news-marquee-physicalweb';}
+
+      static get properties() {
+        return {
+
+          contentName: String,
+
+          data: {
+            type: Object,
+          },
+
+        };
+      }
+
+      _computeDate(date) {
+        const momentDate = moment(date);
+
+        // if (momentDate.isBefore(moment()))
+        return moment(date).calendar();
+      }
+
+    }
+
+    customElements.define(AppNewsMarqueePhysicalweb.is, AppNewsMarqueePhysicalweb);
+
+  </script>
+</dom-module>
