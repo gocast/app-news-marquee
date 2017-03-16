@@ -1,49 +1,49 @@
 <link rel="import" href="../polymer/polymer-element.html">
-<link rel="import" href="../goc-styles/goc-styles.html">
-<link rel="import" href="../goc-icons/goc-icons.html">
-<link rel="import" href="../goc-apps/goc-app-icon.html">
 <link rel="import" href="../moment-import/moment-with-locales.html">
+<link rel="import" href="../goc-styles/goc-styles.html">
 
 <dom-module id="app-news-marquee-physicalweb">
   <template>
-    <style include="header-layout-styles btn-styles icon-btn-styles">
+    <style include="box-styles">
       :host {
         display: block;
         height: 100%;
-        padding: 0 25px;
       }
 
-      ul {
-        margin: 0;
-        padding: 0;
+      .news {
         list-style: none;
+        margin: 20px 0;
+        padding: 0;
       }
 
       .news__item {
-        border-bottom: solid 1px #ddd;
+        padding: 0 20px;
+      }
+
+      .news__item-inner {
+        border-bottom: solid 1px var(--paper-grey-300);
         padding: 10px 0;
       }
 
-      .news__item__addedat {
-        font-weight: 300;
-        color: #888;
-        margin-top: 3px;
-        font-size: 13px;
+      .news__date {
+        color: var(--paper-grey-500);
+        font-size: 14px;
+        margin-top: 8px;
       }
 
+      .news__item:nth-last-child(-n+2) .news__item-inner {
+        border-bottom: none;
+      }
     </style>
 
-    <goc-apps-collection
-        app-name="restaurant-menu"
-        item="{{_appInfo}}"
-        language="[[language]]"></goc-apps-collection>
-
-    <ul class="news">
+    <ul class="news box">
       <dom-repeat items="[[data.items]]">
         <template>
           <li class="news__item">
-            <div class="news__item__text">[[item.text]]</div>
-            <div class="news__item__addedat">[[_computeDate(item.date)]]</div>
+            <div class="news__item-inner">
+              <div class="news__text">[[item.text]]</div>
+              <div class="news__date">[[_computeDate(item.date)]]</div>
+            </div>
           </li>
         </template>
       </dom-repeat>
@@ -61,9 +61,7 @@
 
           contentName: String,
 
-          data: {
-            type: Object,
-          },
+          data: Object
 
         };
       }
